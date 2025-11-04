@@ -24,3 +24,4 @@ export class UserService {
     return await AppDataSource.manager.update(User, {id: id}, user);
   }
 }
+//probar en postman
