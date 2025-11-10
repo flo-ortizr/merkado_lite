@@ -1,19 +1,44 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
+import { ManyToOne, OneToOne, OneToMany, JoinColumn } from "typeorm";
+import { Role } from "./role.entity";
+import { Customer } from "./customer.entity";
+import { InStoreSale } from "./instore_sale.entity";
+import { AuditLog } from "./audit_log.entity";
+import { Notification } from "./notificaction.entity";
 
-@Entity()
+@Entity('user')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number
+  @PrimaryGeneratedColumn()
+  id_user: number;
 
-    @Column()
-    name: string
+  @Column({ length: 100 })
+  name: string;
 
-    @Column()
-    lastname: string
+  @Column({ unique: true })
+  email: string;
 
-    @Column()
-    email: string
+  @Column()
+  password: string;
 
-    @Column()
-    password: string
+  @Column({ length: 20, nullable: true })
+  phone: string;
+
+  @Column({ type: 'enum', enum: ['active', 'inactive'], default: 'active' })
+  status: string;
+
+  @ManyToOne(() => Role, (role) => role.users)
+  @JoinColumn({ name: 'id_role' })
+  role: Role;
+
+  @OneToOne(() => Customer, (customer) => customer.user)
+  customer: Customer;
+
+  @OneToMany(() => InStoreSale, (sale) => sale.user)
+  sales: InStoreSale[];
+
+  @OneToMany(() => AuditLog, (log) => log.user)
+  logs: AuditLog[];
+
+  @OneToMany(() => Notification, (notif) => notif.user)
+  notifications: Notification[];
 }
