@@ -2,36 +2,35 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [nombre, setNombre] = useState("");
+  const [ci, setCi] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [error, setError] = useState("");
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validación básica
-    if (!nombre || !email || !password) {
+    if (!nombre || !ci || !telefono || !email || !password) {
       setError("Por favor completa todos los campos");
       return;
     }
 
     // Aquí iría la llamada real a tu backend
-    router.push("/Login");
+    router.push("/");
   };
 
   return (
-    <div className="min-h-screen flex relative">
+    <div className="min-h-screen flex relative bg-gradient-to-r from-red-700 via-red-600 to-red-500">
       {/* --- LADO IZQUIERDO --- */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-sm p-8 bg-white rounded-xl shadow-2xl">
-          <h1 className="text-3xl font-semibold mb-8 text-center text-gray-800">
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white/90 backdrop-blur-sm">
+        <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl border border-red-100">
+          <h1 className="text-4xl font-extrabold mb-8 text-center text-red-600 tracking-tight">
             Registro
           </h1>
 
@@ -41,7 +40,23 @@ export default function RegisterPage() {
               placeholder="Nombre completo"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
+            />
+
+            <input
+              type="text"
+              placeholder="Cédula de Identidad (CI)"
+              value={ci}
+              onChange={(e) => setCi(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
+            />
+
+            <input
+              type="tel"
+              placeholder="Teléfono"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
             />
 
             <input
@@ -49,57 +64,41 @@ export default function RegisterPage() {
               placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
             />
 
-            <div className="relative">
-              <input
-                type={mostrarPassword ? "text" : "password"}
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border rounded-lg pr-20"
-              />
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
+            />
 
-              {/* Botón solo con texto */}
-              <button
-                type="button"
-                onClick={() => setMostrarPassword(!mostrarPassword)}
-                className="absolute right-3 top-2.5 text-sm text-gray-600 hover:text-black"
-              >
-                {mostrarPassword ? "Ocultar" : "Mostrar"}
-              </button>
-            </div>
-
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-600 text-sm text-center font-medium">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
-              className="w-full px-4 py-3 bg-black text-white rounded-lg"
+              className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 font-semibold shadow-md hover:shadow-lg"
             >
               Registrarme
             </button>
           </form>
-
-          <div className="text-center mt-4">
-            <p className="text-gray-600">
-              ¿Ya tienes cuenta?{" "}
-              <Link href="/Login" className="text-blue-600 hover:text-blue-800">
-                Inicia sesión
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
 
       {/* --- LADO DERECHO (IMAGEN) --- */}
-      <div className="hidden md:flex w-1/2 bg-gray-200 relative">
+      <div className="hidden md:flex w-1/2 items-center justify-center bg-black/30 backdrop-blur-md">
         <Image
           src="/Imagines/Logo.jpg"
           alt="Logo de registro"
-          width={600}
-          height={600}
-          className="object-contain"
+          width={550}
+          height={550}
+          className="object-contain drop-shadow-2xl"
         />
       </div>
     </div>
