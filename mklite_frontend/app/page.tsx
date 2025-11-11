@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -14,69 +13,74 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validación básica
     if (!email || !password) {
       setError("Por favor ingresa email y contraseña");
       return;
     }
 
-    // Aquí iría la llamada real a tu backend
-    // const res = await fetch("/api/login", { ... })
-    // if (res.ok) { router.push("/Home"); } else { setError("Credenciales inválidas"); }
-
-    // De momento simulamos login correcto
+    // Simulación de login correcto
     router.push("/Home");
   };
 
   return (
-    <div className="min-h-screen flex relative">
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-sm p-8 bg-white rounded-xl shadow-2xl">
-          <h1 className="text-3xl font-semibold mb-8 text-center text-gray-800">
-            Login In
+    <div className="min-h-screen flex relative bg-gradient-to-r from-red-700 via-red-600 to-red-500">
+      {/* --- LADO IZQUIERDO (formulario) --- */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white/90 backdrop-blur-sm">
+        <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-2xl border border-red-100">
+          <h1 className="text-4xl font-extrabold mb-8 text-center text-red-600 tracking-tight">
+            Login
           </h1>
 
           <form className="space-y-6" onSubmit={handleLogin}>
             <input
               type="email"
-              placeholder="Email address"
+              placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg"
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
             />
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm"
+            />
+
+            {error && (
+              <p className="text-red-600 text-sm text-center font-medium">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
-              className="w-full px-4 py-3 bg-black text-white rounded-lg"
+              className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 font-semibold shadow-md hover:shadow-lg"
             >
-              Login In
+              Iniciar sesión
             </button>
           </form>
 
           <div className="text-center mt-4">
-            <Link href="/Register" className="text-blue-600 hover:text-blue-800">
-              Sign up
-            </Link>
+            <a
+              href="/Register"
+              className="text-red-600 font-medium hover:text-red-800 transition"
+            >
+              Crear cuenta
+            </a>
           </div>
         </div>
       </div>
 
-      <div className="hidden md:flex w-1/2 bg-gray-200 relative">
+      {/* --- LADO DERECHO (imagen) --- */}
+      <div className="hidden md:flex w-1/2 items-center justify-center bg-black/30 backdrop-blur-md">
         <Image
           src="/Imagines/Logo.jpg"
-          alt="Carrito de compras"
-          width={600}
-          height={600}
-          className="object-contain"
+          alt="Logo de la app"
+          width={550}
+          height={550}
+          className="object-contain drop-shadow-2xl"
         />
       </div>
     </div>
