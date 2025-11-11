@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 import { ManyToOne, OneToOne, OneToMany, JoinColumn } from "typeorm";
-import { Role } from "./role.entity";
-import { Customer } from "./customer.entity";
-import { InStoreSale } from "./instore_sale.entity";
-import { AuditLog } from "./audit_log.entity";
-import { Notification } from "./notificaction.entity";
+import { Role } from "../role/role.entity";
+import { Customer } from "../customer/customer.entity";
+import { InStoreSale } from "../entity/instore_sale.entity";
+import { AuditLog } from "../entity/audit_log.entity";
+import { Notification } from "../entity/notificaction.entity";
 
 @Entity('user')
 export class User {
@@ -13,6 +13,9 @@ export class User {
 
   @Column({ length: 100 })
   name: string;
+
+  @Column({ length: 20 })
+  ci : string;
 
   @Column({ unique: true })
   email: string;

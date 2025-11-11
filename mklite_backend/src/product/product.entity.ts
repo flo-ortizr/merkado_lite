@@ -1,11 +1,11 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn} from 'typeorm';
-import { Category } from './category.entity';
-import { Supplier } from './supplier.entity';
-import { Inventory } from './inventory.entity';
-import { OrderDetail } from './order_detail.entity';
-import { SaleDetail } from './sale_detail.entity';
-import { Promotion } from './promotion.entity';
-import { PriceHistory } from './price_history.entity';
+import { Category } from '../category/category.entity';
+import { Supplier } from '../entity/supplier.entity';
+import { Inventory } from '../entity/inventory.entity';
+import { OrderDetail } from '../entity/order_detail.entity';
+import { SaleDetail } from '../entity/sale_detail.entity';
+import { Promotion } from '../entity/promotion.entity';
+import { PriceHistory } from '../entity/price_history.entity';
 
 @Entity('product')
 export class Product {
