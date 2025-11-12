@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Supplier } from './supplier.entity';
+import { Supplier } from '../supplier/supplier.entity';
 
 @Entity('purchase_order')
 export class PurchaseOrder {
