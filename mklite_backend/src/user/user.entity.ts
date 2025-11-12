@@ -2,9 +2,9 @@ import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 import { ManyToOne, OneToOne, OneToMany, JoinColumn } from "typeorm";
 import { Role } from "../role/role.entity";
 import { Customer } from "../customer/customer.entity";
-import { InStoreSale } from "../entity/instore_sale.entity";
-import { AuditLog } from "../entity/audit_log.entity";
-import { Notification } from "../entity/notificaction.entity";
+import { InStoreSale } from "../instore_sale/instore_sale.entity";
+import { AuditLog } from "../audit_log/audit_log.entity";
+import { Notification } from "../notification/notificaction.entity";
 
 @Entity('user')
 export class User {
