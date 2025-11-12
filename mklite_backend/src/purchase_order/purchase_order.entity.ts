@@ -4,7 +4,7 @@ import { Supplier } from '../supplier/supplier.entity';
 @Entity('purchase_order')
 export class PurchaseOrder {
   @PrimaryGeneratedColumn()
-  id_order: number;
+  id_purchase_order: number;
 
   @ManyToOne(() => Supplier, (supplier) => supplier.purchaseOrders)
   @JoinColumn({ name: 'id_supplier' })
