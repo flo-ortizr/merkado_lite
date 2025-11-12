@@ -4,7 +4,7 @@ import { Role } from "../role/role.entity";
 import { Customer } from "../customer/customer.entity";
 import { InStoreSale } from "../instore_sale/instore_sale.entity";
 import { AuditLog } from "../audit_log/audit_log.entity";
-import { Notification } from "../notification/notificaction.entity";
+import { Notification } from "../notification/notification.entity";
 
 @Entity('user')
 export class User {
