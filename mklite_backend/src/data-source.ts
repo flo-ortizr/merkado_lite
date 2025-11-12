@@ -1,7 +1,11 @@
 import { DataSource } from "typeorm"
 import { User } from "./user/user.entity"
+import { Customer } from "./customer/customer.entity"
+import { Product } from "./product/product.entity"
+import { Category } from "./category/category.entity"
+import { Role } from "./role/role.entity"
 export const AppDataSource = new DataSource({
-    type: "postgres",
+    type: "mysql",
     host: "localhost",
     port: 5432,
     username: "merkado_admin",
@@ -9,7 +13,7 @@ export const AppDataSource = new DataSource({
     database: "mklite",
     synchronize: true,
     logging: true,
-    entities: [User],
+    entities: [Role, User, Customer, Product, Category],
     subscribers: [],
     migrations: [],
 })

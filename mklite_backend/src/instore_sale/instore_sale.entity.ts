@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../user/user.entity';
-import { SaleDetail } from './sale_detail.entity';
+import { InStoreSaleDetail } from 'src/instore_sale_detail/instore_sale_detail.entity'; 
 
 @Entity('instore_sale')
 export class InStoreSale {
@@ -20,6 +20,6 @@ export class InStoreSale {
   @Column()
   payment_method: string;
 
-  @OneToMany(() => SaleDetail, (detail) => detail.sale)
-  details: SaleDetail[];
+  @OneToMany(() => InStoreSaleDetail, (detail) => detail.sale)
+  details: InStoreSaleDetail[];
 }

@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Product } from '../product/product.entity';
-import { PurchaseOrder } from './purchase_order.entity';
-
+import { PurchaseOrder } from '../purchase_order/purchase_order.entity';
 @Entity('supplier')
 export class Supplier {
   @PrimaryGeneratedColumn()
@@ -14,7 +13,6 @@ export class Supplier {
   phone: string;
 
   @Column()
-  email: string;
 
   @Column()
   address: string;

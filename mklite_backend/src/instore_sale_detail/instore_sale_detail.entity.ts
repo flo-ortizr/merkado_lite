@@ -1,9 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { InStoreSale } from './instore_sale.entity';
+import { InStoreSale } from '../instore_sale/instore_sale.entity';
 import { Product } from '../product/product.entity';
 
-@Entity('sale_detail')
-export class SaleDetail {
+@Entity('instore_sale_detail')
+export class InStoreSaleDetail {
   @PrimaryGeneratedColumn()
   id_sale_detail: number;
 
