@@ -13,8 +13,6 @@ export class Supplier {
   phone: string;
 
   @Column()
-
-  @Column()
   address: string;
 
   @OneToMany(() => Product, (product) => product.supplier)
