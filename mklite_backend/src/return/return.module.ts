@@ -7,4 +7,4 @@ import { ReturnService } from "./return.service";
     controllers: [ReturnController],
     providers: [ReturnService],
 })
-export class PurchaseOrderModule {}
+export class ReturnModule {}
