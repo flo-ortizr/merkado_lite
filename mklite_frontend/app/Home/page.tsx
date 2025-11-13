@@ -5,12 +5,19 @@ export default function HomePage() {
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f0f0f0' }}>
 
-      {/* Header */}
-      <header style={{ backgroundColor: '#333', color: '#fff', padding: '10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
-          <input 
-            type="text" 
-            placeholder="Buscar productos por nombre..." 
+      {/* Header - Fondo negro (#1a1a1a) */}
+      <header style={{ backgroundColor: '#1a1a1a', color: '#fff', padding: '10px' }}>
+        {/* Logo y barra de búsqueda */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '0 20px' }}>
+          {/* Logo */}
+          <div style={{ fontWeight: 'bold', fontSize: '24px', color: '#fff' }}>
+            MERCADO LITE
+          </div>
+
+          {/* Barra de búsqueda */}
+          <input
+            type="text"
+            placeholder="Buscar productos por nombre..."
             style={{
               padding: '10px',
               width: '400px',
@@ -20,150 +27,206 @@ export default function HomePage() {
               color: '#333',
             }}
           />
+
+          {/* Account y Cart (Placeholders como en la imagen) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <span style={{ cursor: 'pointer' }}>Account</span>
+            <span style={{ cursor: 'pointer' }}>Cart</span>
+          </div>
         </div>
       </header>
 
-      {/* Main Section */}
-      <section style={{ padding: '20px', textAlign: 'center' }}>
-        <div style={{ backgroundColor: '#777', padding: '20px', borderRadius: '15px', marginBottom: '30px', height: '300px' }}>
-          <h1 style={{ fontSize: '24px', marginBottom: '10px', color: '#fff' }}>Alimentos Frescos Entrega Rápida</h1>
-          <p style={{ fontSize: '18px', color: '#fff' }}>Recibe productos frescos, artículos de despensa y todo para tu hogar en la puerta de tu casa en menos de 30 minutos.</p>
-          <button style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            backgroundColor: '#555',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}>Comprar ahora</button>
-        </div>
+      {/* Main Section 
+          CAMBIO AQUÍ: 'padding' de '20px' a '20px 0' para quitar bordes laterales
+      */}
+      <section style={{ padding: '20px 0', textAlign: 'center' }}>
         
+        {/* Banner Principal - Fondo negro (#1a1a1a) */}
+        <div style={{
+          backgroundColor: '#1a1a1a', // Fondo negro
+          padding: '20px',
+          // borderRadius: '15px', // <-- CAMBIO: Esta línea fue eliminada
+          marginBottom: '30px',
+          height: '700px', // Mantenemos la altura de 900px
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          color: '#fff'
+        }}>
+          {/* Contenido de texto a la izquierda */}
+          <div style={{ textAlign: 'left', maxWidth: '50%', padding: '0 40px' }}> {/* Añadido padding para que el texto no se pegue al borde */}
+            <span style={{
+              backgroundColor: '#555',
+              color: '#fff',
+              padding: '5px 10px',
+              borderRadius: '5px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              display: 'inline-block'
+            }}>Oferta Flash!</span>
+            <h1 style={{ fontSize: '48px', marginBottom: '10px', color: '#fff' }}>Alimentos Frescos Delivery Fast</h1>
+            <p style={{ fontSize: '18px', color: '#ccc' }}>Recibe productos frescos, artículos de despensa y todo para tu hogar en la puerta de tu casa en menos de 30 minutos.</p>
+            <button style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              backgroundColor: '#555',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              marginTop: '20px'
+            }}>Comprar ahora</button>
+          </div>
+
+          {/* Rectángulo gris para la imagen a la derecha */}
+          <div style={{
+            width: '45%',
+            height: '460px', // Ajustado a la altura del banner
+            backgroundColor: '#888',
+            borderRadius: '10px', // <-- Eliminado también para que sea recto
+            marginRight: '40px' // Añadido margen para que no se pegue al borde
+          }}>
+          </div>
+        </div>
+
         {/* Categories */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', justifyItems: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 200px)', columnGap: '300px', rowGap: '40px', justifyContent: 'center' }}>
+          
+          {/* Categoría 1 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Frutas frescas</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>20 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Frutas frescas</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Frutas frescas</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>20 artículos</p>
+            </div>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          {/* Categoría 2 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Verduras</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>30 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Verduras</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Verduras</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>30 artículos</p>
+            </div>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          {/* Categoría 3 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Productos lácteos</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>100 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Productos lácteos</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Productos lácteos</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>100 artículos</p>
+            </div>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          {/* Categoría 4 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Carne y aves de corral</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>60 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Carne y aves de corral</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Carne y aves de corral</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>60 artículos</p>
+            </div>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          {/* Categoría 5 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Artículos de panadería</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>20 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Artículos de panadería</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Artículos de panadería</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>20 artículos</p>
+            </div>
           </div>
 
-          <div style={{ textAlign: 'center' }}>
+          {/* Categoría 6 */}
+          <div style={{
+            width: '300px',
+            height: '310px',
+            backgroundColor: '#bbb',
+            borderRadius: '15px',
+            position: 'relative',
+            overflow: 'hidden',
+            cursor: 'pointer'
+          }}>
             <div style={{
-              width: '200px',
-              height: '200px',
-              backgroundColor: '#bbb',
-              borderRadius: '15px',
-              marginBottom: '10px',
-            }}></div>
-            <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Bocadillos</h3>
-            <p style={{ fontSize: '14px', color: '#555' }}>200 artículos</p>
-            <button style={{
-              padding: '10px 20px',
-              backgroundColor: '#888',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-            }}>Bocadillos</button>
+              position: 'absolute',
+              bottom: '10px',
+              left: '10px',
+              textAlign: 'left',
+              color: '#fff'
+            }}>
+              <h3 style={{ fontSize: '18px', marginBottom: '5px' }}>Bocadillos</h3>
+              <p style={{ fontSize: '14px', color: '#ccc' }}>200 artículos</p>
+            </div>
           </div>
+
         </div>
       </section>
     </div>
   );
 }
-
-
