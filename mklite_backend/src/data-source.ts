@@ -21,7 +21,7 @@ import {Notification} from "./notification/notification.entity"
 export const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
-    port: 5432,
+    port: 3306,
     username: "merkado_admin",
     password: "1234",
     database: "mklite",
