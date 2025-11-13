@@ -1,11 +1,11 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, OneToMany, JoinColumn} from 'typeorm';
 import { Category } from '../category/category.entity';
-import { Supplier } from '../entity/supplier.entity';
-import { Inventory } from '../entity/inventory.entity';
-import { OrderDetail } from '../entity/order_detail.entity';
-import { SaleDetail } from '../entity/sale_detail.entity';
-import { Promotion } from '../entity/promotion.entity';
-import { PriceHistory } from '../entity/price_history.entity';
+import { Supplier } from '../supplier/supplier.entity';
+import { Inventory } from '../inventory/inventory.entity';
+import { OrderDetail } from "../order_detail/order_detail.entity";
+import { InStoreSaleDetail } from 'src/instore_sale_detail/instore_sale_detail.entity';
+import { Promotion } from '../promotion/promotion.entity';
+import { PriceHistory } from '../price_history/price_history.entity';
 
 @Entity('product')
 export class Product {
@@ -41,8 +41,8 @@ export class Product {
   @OneToMany(() => OrderDetail, (dp) => dp.product)
   orderDetails: OrderDetail[];
 
-  @OneToMany(() => SaleDetail, (dv) => dv.product)
-  saleDetails: SaleDetail[];
+  @OneToMany(() => InStoreSaleDetail, (dv) => dv.product)
+  saleDetails: InStoreSaleDetail[];
 
   @OneToMany(() => Promotion, (promo) => promo.product)
   promotions: Promotion[];
