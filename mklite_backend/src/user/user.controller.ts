@@ -1,5 +1,5 @@
 import {Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { User } from 'src/entity/user.entity';
+import { User } from 'src/user/user.entity';
 import { UserService } from './user.service';
 
 @Controller('/user')
@@ -24,11 +24,11 @@ export class UserController {
 
     @Delete('/:id')
     deleteUser(@Param() params : any){
-        return this.userService.DeleteUser(params.id);
+        return this.userService.deleteUser(params.id);
     }
 
     @Put('/:id')
     updateUser(@Param() params : any, user : User){
-        return this.userService.UpdateUser(params.id, user);
+        return this.userService.updateUser(params.id, user);
     }
 }
