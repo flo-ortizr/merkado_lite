@@ -32,3 +32,4 @@ export const AppDataSource = new DataSource({
     subscribers: [],
     migrations: [],
 })
+export class AppModule {}

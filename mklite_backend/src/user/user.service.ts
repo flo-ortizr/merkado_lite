@@ -1,27 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { AppDataSource } from 'src/data-source';
-import { User } from 'src/user/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
 
 @Injectable()
 export class UserService {
-  async createUser(user: User){
-    return await AppDataSource.manager.save(User, user);
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+  ) {}
+
+  async createUser(user: User) {
+    return this.userRepo.save(user);
   }
 
   async getAllUsers() {
-    return await AppDataSource.manager.find(User);
+    return this.userRepo.find({ relations: ['role', 'customer', 'sales', 'logs', 'notifications'] });
   }
 
   async getUserById(id: number) {
-    return await AppDataSource.manager.findOneBy(User, {id_user: id});
+    return this.userRepo.findOne({ where: { id_user: id } });
   }
 
-  async DeleteUser(id: number) {
-    return await AppDataSource.manager.delete(User, {id_user: id});
+  async deleteUser(id: number) {
+    return this.userRepo.delete({ id_user: id });
   }
 
-  async UpdateUser(id: number, user: User) {
-    return await AppDataSource.manager.update(User, {id_user: id}, user);
+  async updateUser(id: number, user: User) {
+    return this.userRepo.update({ id_user: id }, user);
   }
 }
-//probar en postman
