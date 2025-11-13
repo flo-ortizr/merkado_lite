@@ -8,7 +8,6 @@ import { OrderDetail } from "./order_detail/order_detail.entity"
 import { Supplier } from "./supplier/supplier.entity"
 import { Inventory } from "./inventory/inventory.entity"
 import { InStoreSale } from "./instore_sale/instore_sale.entity"
-import { InsertQueryBuilder } from "typeorm/browser"
 import { InStoreSaleDetail } from "./instore_sale_detail/instore_sale_detail.entity"
 import { PurchaseOrder } from "./purchase_order/purchase_order.entity"
 import { Customer } from "./customer/customer.entity"
@@ -17,6 +16,8 @@ import { Return } from "./return/return.entity"
 import { Promotion } from "./promotion/promotion.entity"
 import { PriceHistory } from "./price_history/price_history.entity"
 import { Delivery } from "./delivery/delivery.entity"
+import {Notification} from "./notification/notification.entity"
+
 export const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
