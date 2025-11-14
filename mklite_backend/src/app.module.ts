@@ -19,10 +19,12 @@ import { CustomerModule } from './customer/customer.module';
 import { CategoryModule } from './category/category.module';
 import { AuditLogModule } from './audit_log/audit_log.module';
 import { ReturnModule } from './return/return.module';
+import { CartModule } from './cart/cart.module';
+import { CartItemModule } from './cart_item/cart_item.module';
 
 @Module({
   imports: [UserModule, RoleModule, ReturnModule, PurchaseOrder, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
-    InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule],
+    InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule, CartModule, CartItemModule],
   controllers: [AppController],
   providers: [AppService],
 })
