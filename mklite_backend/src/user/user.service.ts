@@ -3,24 +3,28 @@ import { Injectable } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { User } from './user.entity';
 import { Role } from '../role/role.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   async createUser(userData: Partial<User>) {
-    if (!userData) throw new Error('No se recibió data del usuario');
+  if (!userData) throw new Error('No se recibió data del usuario');
 
-    // Buscar rol Cliente
-    const role = await AppDataSource.manager.findOneBy(Role, { id_role: 1 });
-    if (!role) throw new Error('Role no encontrado');
+  const role = await AppDataSource.manager.findOneBy(Role, { id_role: 1 });
+  if (!role) throw new Error('Role no encontrado');
 
-    // Crear entidad User
-    const user = AppDataSource.manager.create(User, {
-      ...userData,
-      role, // asignamos entidad
-    });
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-    return await AppDataSource.manager.save(User, user);
-  }
+  const user = AppDataSource.manager.create(User, {
+    ...userData,
+    password: hashedPassword,
+    role,
+  });
+
+  return await AppDataSource.manager.save(User, user);
+}
+
 
   async getAllUsers() {
     return await AppDataSource.manager.find(User);
@@ -36,5 +40,19 @@ export class UserService {
 
   async UpdateUser(id: number, userData: Partial<User>) {
     return await AppDataSource.manager.update(User, { id_user: id }, userData);
+  }
+
+  async findByEmail(email: string) {
+    return await AppDataSource.manager.findOneBy(User, { email });
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.findByEmail(email);
+    if (!user) return null;
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return null;
+
+    return user;
   }
 }
