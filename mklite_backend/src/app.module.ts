@@ -20,10 +20,11 @@ import { AuditLogModule } from './audit_log/audit_log.module';
 import { ReturnModule } from './return/return.module';
 import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart_item/cart_item.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [UserModule, RoleModule, ReturnModule, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
-    InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule, CartModule, CartItemModule],
+    InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule, CartModule, CartItemModule,  AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
