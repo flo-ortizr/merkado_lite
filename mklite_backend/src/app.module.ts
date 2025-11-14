@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
-import { PurchaseOrder } from './purchase_order/purchase_order.entity';
 import { PromotionModule } from './promotion/promotion.module';
 import { ProductModule } from './product/product.module';
 import { PriceHistoryModule } from './price_history/price_history.module';
@@ -23,7 +22,7 @@ import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart_item/cart_item.module';
 
 @Module({
-  imports: [UserModule, RoleModule, ReturnModule, PurchaseOrder, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
+  imports: [UserModule, RoleModule, ReturnModule, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
     InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule, CartModule, CartItemModule],
   controllers: [AppController],
   providers: [AppService],
