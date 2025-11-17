@@ -1,10 +1,11 @@
 'use client'; 
 
-import React, { useState } from 'react'; 
+import React, { useState, useRef, useEffect } from 'react'; 
 import Image from 'next/image'; 
+import { useRouter } from 'next/navigation'; 
 import styles from './HomePage.module.css'; 
 
-// --- 1. Definimos los "Tipos" ---
+// --- 1. Tipos ---
 type Product = {
   id: number;
   nombre: string;
@@ -16,112 +17,104 @@ type Product = {
 type ProductCardProps = {
   product: Product;
   onCardClick: (product: Product) => void;
+  onAddToCart: (product: Product, qty: number) => void;
 };
 
 type ProductShelfProps = {
+  id: string; // <--- NUEVO: Necesitamos un ID para identificar la sección
   title: string;
   products: Product[];
   forwardRef: React.RefObject<HTMLElement | null>; 
   onProductClick: (product: Product) => void;
+  onAddToCart: (product: Product, qty: number) => void;
 };
 
 type ProductModalProps = {
   product: Product | null;
   onClose: () => void;
+  onAddToCart: (product: Product, qty: number) => void;
 };
 
-// --- 2. Tarjeta de Producto (CON CONTADOR Y BOTÓN AGREGAR) ---
-const ProductCard = ({ product, onCardClick }: ProductCardProps) => {
-  
-  const [quantity, setQuantity] = useState(1);
+type ConfirmationModalProps = {
+  isOpen: boolean;
+  onKeepShopping: () => void;
+  onGoToCart: () => void;
+};
 
-  const handleIncrement = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    setQuantity(prev => prev + 1);
-  };
+// --- 2. Componentes Auxiliares ---
 
-  const handleDecrement = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setQuantity(prev => (prev > 1 ? prev - 1 : 1));
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    alert(`Agregado: ${quantity} unidad(es) de "${product.nombre}" al carrito.`);
-    setQuantity(1); 
-  };
-
+const ConfirmationModal = ({ isOpen, onKeepShopping, onGoToCart }: ConfirmationModalProps) => {
+  if (!isOpen) return null;
   return (
-    <div onClick={() => onCardClick(product)} className={styles.productCard}>
-      <div className={styles.cardImage}>
-        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Image 
-            src={product.image} 
-            alt={product.nombre} 
-            fill 
-            style={{ objectFit: 'contain', padding: '10px' }} 
-          />
-        </div>
-      </div>
-      <div className={styles.cardContent}>
-        <h3 className={styles.cardTitle}>{product.nombre}</h3>
-        <span className={styles.cardPrice}>{product.precio}</span>
-        
-        <div className={styles.actionRow}>
-          <div className={styles.qtySelector}>
-            <button onClick={handleDecrement} className={styles.qtyBtn}>-</button>
-            <span className={styles.qtyValue}>{quantity}</span>
-            <button onClick={handleIncrement} className={styles.qtyBtn}>+</button>
-          </div>
-
-          <button onClick={handleAddToCart} className={styles.addButton}>
-            Agregar
-          </button>
+    <div className={styles.modalBackdrop}>
+      <div className={styles.confirmationWindow}>
+        <div className={styles.confirmationIcon}>✅</div>
+        <h3 className={styles.confirmationTitle}>¡Agregado!</h3>
+        <p className={styles.confirmationText}>El producto se añadió a tu carrito.</p>
+        <div className={styles.confirmationButtons}>
+          <button onClick={onKeepShopping} className={styles.btnKeepShopping}>Seguir viendo</button>
+          <button onClick={onGoToCart} className={styles.btnGoToCart}>Ir al carrito</button>
         </div>
       </div>
     </div>
   );
 };
 
-// --- 3. Fila de Productos ---
-const ProductShelf = ({ title, products, forwardRef, onProductClick }: ProductShelfProps) => (
-  <section ref={forwardRef} className={styles.productShelf}>
+const ProductCard = ({ product, onCardClick, onAddToCart }: ProductCardProps) => {
+  const [quantity, setQuantity] = useState(1);
+  const handleIncrement = (e: React.MouseEvent) => { e.stopPropagation(); setQuantity(prev => prev + 1); };
+  const handleDecrement = (e: React.MouseEvent) => { e.stopPropagation(); setQuantity(prev => (prev > 1 ? prev - 1 : 1)); };
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart(product, quantity);
+    setQuantity(1);
+  };
+
+  return (
+    <div onClick={() => onCardClick(product)} className={styles.productCard}>
+      <div className={styles.cardImage}>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <Image src={product.image} alt={product.nombre} fill style={{ objectFit: 'contain', padding: '10px' }} />
+        </div>
+      </div>
+      <div className={styles.cardContent}>
+        <h3 className={styles.cardTitle}>{product.nombre}</h3>
+        <span className={styles.cardPrice}>{product.precio}</span>
+        <div className={styles.actionRow}>
+          <div className={styles.qtySelector}>
+            <button onClick={handleDecrement} className={styles.qtyBtn}>-</button>
+            <span className={styles.qtyValue}>{quantity}</span>
+            <button onClick={handleIncrement} className={styles.qtyBtn}>+</button>
+          </div>
+          <button onClick={handleAddToCart} className={styles.addButton}>Agregar</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProductShelf = ({ id, title, products, forwardRef, onProductClick, onAddToCart }: ProductShelfProps) => (
+  // Añadimos el ID a la sección para que el observador sepa cuál es
+  <section id={id} ref={forwardRef} className={styles.productShelf}>
     <h2 className={styles.shelfTitle}>{title}</h2>
     <div className={styles.productGrid}>
       {products.map((producto) => (
-        <ProductCard 
-          key={producto.id}
-          product={producto}
-          onCardClick={onProductClick}
-        />
+        <ProductCard key={producto.id} product={producto} onCardClick={onProductClick} onAddToCart={onAddToCart} />
       ))}
     </div>
   </section>
 );
 
-// --- 4. Modal ---
-const ProductModal = ({ product, onClose }: ProductModalProps) => {
+const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
   if (!product) return null;
-
-  // Estado local para la cantidad en el modal (se reinicia al abrir)
-  // Nota: En una app real, usarías un useEffect para resetear esto cuando cambia el producto
   const [quantityModal, setQuantityModal] = useState(1);
-
-  const handleIncrementModal = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    setQuantityModal(prev => prev + 1);
-  };
-
-  const handleDecrementModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setQuantityModal(prev => (prev > 1 ? prev - 1 : 1));
-  };
-
+  const handleIncrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => prev + 1); };
+  const handleDecrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => (prev > 1 ? prev - 1 : 1)); };
   const handleAddToCartModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Agregado: ${quantityModal} unidad(es) de "${product.nombre}" al carrito.`);
+    onAddToCart(product, quantityModal);
     setQuantityModal(1);
-    onClose();
+    onClose(); 
   };
 
   return (
@@ -138,16 +131,12 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
             <h1 className={styles.modalTitle}>{product.nombre}</h1>
             <p className={styles.modalDescription}>{product.description}</p>
             <h2 className={styles.modalPrice}>{product.precio}</h2>
-            
             <div className={styles.modalButtonsContainer}>
-              {/* Selector de Cantidad en el Modal */}
               <div className={styles.qtySelectorModal}>
                 <button onClick={handleDecrementModal} className={styles.qtyBtnModal}>-</button>
                 <span className={styles.qtyValueModal}>{quantityModal}</span>
                 <button onClick={handleIncrementModal} className={styles.qtyBtnModal}>+</button>
               </div>
-
-              {/* Botón de Añadir al Carrito del Modal */}
               <button onClick={handleAddToCartModal} className={styles.modalButton}>🛒 Añadir al Carrito</button>
             </div>
           </div>
@@ -157,77 +146,132 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
   );
 };
 
-// --- 5. Componente Principal ---
+// --- 6. Componente Principal ---
 export default function HomePage() {
-  const abarrotesRef = React.useRef<HTMLElement | null>(null);
-  const bebidasRef = React.useRef<HTMLElement | null>(null);
-  const carnesRef = React.useRef<HTMLElement | null>(null);
-  const frutasRef = React.useRef<HTMLElement | null>(null);
-  const verdurasRef = React.useRef<HTMLElement | null>(null);
-  const lacteosRef = React.useRef<HTMLElement | null>(null);
-  const panaderiaRef = React.useRef<HTMLElement | null>(null);
-  const limpiezaRef = React.useRef<HTMLElement | null>(null);
-  const cuidadoPersonalRef = React.useRef<HTMLElement | null>(null);
-  const cerealesRef = React.useRef<HTMLElement | null>(null);
-
-  const handleScrollTo = (ref: React.RefObject<HTMLElement | null>) => {
-    if (ref.current) ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const router = useRouter(); 
+  
+  // Refs para cada sección
+  const categoryRefs = {
+    abarrotes: useRef<HTMLElement | null>(null),
+    bebidas: useRef<HTMLElement | null>(null),
+    carnes: useRef<HTMLElement | null>(null),
+    frutas: useRef<HTMLElement | null>(null),
+    verduras: useRef<HTMLElement | null>(null),
+    lacteos: useRef<HTMLElement | null>(null),
+    panaderia: useRef<HTMLElement | null>(null),
+    limpieza: useRef<HTMLElement | null>(null),
+    personal: useRef<HTMLElement | null>(null),
+    cereales: useRef<HTMLElement | null>(null),
   };
 
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('abarrotes');
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  // --- MAGIA DEL SCROLL SPY (OBSERVADOR) ---
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-150px 0px -70% 0px', // Ajuste para detectar cuando la sección está arriba
+      threshold: 0
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Cuando una sección entra en la zona visible, actualizamos el estado
+          setActiveCategory(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Observamos todas las secciones
+    Object.values(categoryRefs).forEach((ref) => {
+      if (ref.current) observer.observe(ref.current);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+
+  const handleScrollTo = (key: string) => {
+    const ref = categoryRefs[key as keyof typeof categoryRefs];
+    if (ref && ref.current) {
+      // Un pequeño ajuste (-140) para compensar el header fijo
+      const y = ref.current.getBoundingClientRect().top + window.pageYOffset - 140;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+      // setActiveCategory se actualizará solo gracias al observer
+    }
+  };
+
+  // Cargar carrito
+  useEffect(() => {
+    const cartJson = localStorage.getItem('mklite_cart');
+    if (cartJson) {
+      const cart = JSON.parse(cartJson);
+      // @ts-ignore
+      const totalQty = cart.reduce((acc, item) => acc + item.quantity, 0);
+      setCartCount(totalQty);
+    }
+  }, []);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
-    setIsModalOpen(true);
+    setIsDetailOpen(true);
   };
 
-  // Datos de ejemplo (CORREGIDO: Eliminé el tipo explícito conflictivo)
-  const productData = {
-    abarrotes: [ 
-      { id: 101, nombre: 'Arroz Grano de Oro 1Kg', precio: 'Bs. 7.00', description: 'Arroz de primera calidad.', image: '/imagines/arroz.jpeg' }, 
-      { id: 102, nombre: 'Fideo Lazzaroni 1Kg', precio: 'Bs. 6.00', description: 'Fideo para sopas y guisos.', image: '/images/fideo.png' }, 
-    ],
-    bebidas: [ 
-      { id: 201, nombre: 'Coca Cola 2L', precio: 'Bs. 10.00', description: 'Refresco sabor cola.', image: '/images/coca.png' }, 
-      { id: 202, nombre: 'Agua Vital 2L', precio: 'Bs. 5.00', description: 'Agua sin gas.', image: '/images/agua.png' }, 
-    ],
-    carnes: [ 
-      { id: 301, nombre: 'Pollo Sofía (Kg)', precio: 'Bs. 15.00', description: 'Pollo fresco entero.', image: '/images/pollo.png' }, 
-      { id: 302, nombre: 'Carne Molida Especial', precio: 'Bs. 30.00', description: 'Carne de res seleccionada.', image: '/images/carne.png' }, 
-    ],
-    frutas: [ 
-      { id: 401, nombre: 'Manzana Fuji (Kg)', precio: 'Bs. 12.00', description: 'Manzanas rojas importadas.', image: '/images/manzana.png' }, 
-      { id: 402, nombre: 'Banana (Kg)', precio: 'Bs. 5.00', description: 'Banana chapare.', image: '/images/banana.png' }, 
-      { id: 403, nombre: 'Naranja (Kg)', precio: 'Bs. 8.00', description: 'Naranja para jugo.', image: '/images/naranja.png' }, 
-      { id: 404, nombre: 'Uva Verde (Kg)', precio: 'Bs. 14.00', description: 'Uva sin semilla.', image: '/images/uva.png' }, 
-      { id: 405, nombre: 'Piña (Und)', precio: 'Bs. 10.00', description: 'Piña dulce.', image: '/images/pina.png' } 
-    ],
-    verduras: [ 
-      { id: 501, nombre: 'Tomate (Kg)', precio: 'Bs. 7.00', description: 'Tomate perita.', image: '/images/tomate.png' }, 
-      { id: 502, nombre: 'Lechuga Crespa', precio: 'Bs. 3.00', description: 'Lechuga hidropónica.', image: '/images/lechuga.png' }, 
-    ],
-    lacteos: [ 
-      { id: 601, nombre: 'Leche PIL 1L', precio: 'Bs. 6.00', description: 'Leche entera pasteurizada.', image: '/images/leche.png' }, 
-      { id: 602, nombre: 'Yogurt Bebible 1L', precio: 'Bs. 12.00', description: 'Yogurt sabor frutilla.', image: '/images/yogurt.png' }, 
-    ],
-    panaderia: [ 
-      { id: 701, nombre: 'Pan Molde Blanco', precio: 'Bs. 10.00', description: 'Pan suave para sandwich.', image: '/images/pan.png' }, 
-      { id: 702, nombre: 'Pan Integral', precio: 'Bs. 12.00', description: 'Alto en fibra.', image: '/images/pan_integral.png' }, 
-    ],
-    limpieza: [ 
-      { id: 801, nombre: 'Lavandina 1L', precio: 'Bs. 5.00', description: 'Desinfectante potente.', image: '/images/lavandina.png' }, 
-      { id: 802, nombre: 'Detergente OMO', precio: 'Bs. 15.00', description: 'Detergente en polvo.', image: '/images/detergente.png' }, 
-    ],
-    cuidadoPersonal: [ 
-      { id: 901, nombre: 'Shampoo Sedal', precio: 'Bs. 22.00', description: 'Para cabello liso.', image: '/images/shampoo.png' }, 
-      { id: 902, nombre: 'Jabón Lux (Pack 3)', precio: 'Bs. 10.00', description: 'Jabón de tocador.', image: '/images/jabon.png' }, 
-    ],
-    cereales: [ 
-      { id: 1001, nombre: 'Galletas Mabel', precio: 'Bs. 4.00', description: 'Galletas de agua.', image: '/images/galletas.png' }, 
-      { id: 1002, nombre: 'Cereal Chocapic', precio: 'Bs. 25.00', description: 'Cereal de chocolate.', image: '/images/cereal.png' }, 
-    ],
+  const handleAddToCart = (product: Product, qty: number) => {
+    const cartJson = localStorage.getItem('mklite_cart');
+    let cart = cartJson ? JSON.parse(cartJson) : [];
+    const priceNum = parseFloat(product.precio.replace('Bs. ', ''));
+    // @ts-ignore
+    const existingItemIndex = cart.findIndex((item) => item.id === product.id);
+
+    if (existingItemIndex >= 0) {
+      cart[existingItemIndex].quantity += qty;
+    } else {
+      cart.push({ ...product, quantity: qty, priceNumeric: priceNum });
+    }
+    localStorage.setItem('mklite_cart', JSON.stringify(cart));
+
+    setCartCount(prev => prev + qty); 
+    setIsConfirmationOpen(true); 
   };
+
+  const handleKeepShopping = () => setIsConfirmationOpen(false);
+  const handleGoToCart = () => { setIsConfirmationOpen(false); router.push('/carrito'); };
+
+  // Datos de ejemplo
+  const productData: { [key: string]: Product[] } = {
+    abarrotes: [ { id: 101, nombre: 'Arroz Grano de Oro 1Kg', precio: 'Bs. 7.00', description: 'Arroz de primera calidad.', image: '/imagines/arroz.jpeg' }, { id: 102, nombre: 'Fideo Lazzaroni 1Kg', precio: 'Bs. 6.00', description: 'Fideo para sopas y guisos.', image: '/images/fideo.png' }, ],
+    bebidas: [ { id: 201, nombre: 'Coca Cola 2L', precio: 'Bs. 10.00', description: 'Refresco sabor cola.', image: '/images/coca.png' }, { id: 202, nombre: 'Agua Vital 2L', precio: 'Bs. 5.00', description: 'Agua sin gas.', image: '/images/agua.png' }, ],
+    carnes: [ { id: 301, nombre: 'Pollo Sofía (Kg)', precio: 'Bs. 15.00', description: 'Pollo fresco entero.', image: '/images/pollo.png' }, { id: 302, nombre: 'Carne Molida Especial', precio: 'Bs. 30.00', description: 'Carne de res seleccionada.', image: '/images/carne.png' }, ],
+    frutas: [ { id: 401, nombre: 'Manzana Fuji (Kg)', precio: 'Bs. 12.00', description: 'Manzanas rojas importadas.', image: '/images/manzana.png' }, { id: 402, nombre: 'Banana (Kg)', precio: 'Bs. 5.00', description: 'Banana chapare.', image: '/images/banana.png' }, { id: 403, nombre: 'Naranja (Kg)', precio: 'Bs. 8.00', description: 'Naranja para jugo.', image: '/images/naranja.png' }, { id: 404, nombre: 'Uva Verde (Kg)', precio: 'Bs. 14.00', description: 'Uva sin semilla.', image: '/images/uva.png' }, { id: 405, nombre: 'Piña (Und)', precio: 'Bs. 10.00', description: 'Piña dulce.', image: '/images/pina.png' } ],
+    verduras: [ { id: 501, nombre: 'Tomate (Kg)', precio: 'Bs. 7.00', description: 'Tomate perita.', image: '/images/tomate.png' }, { id: 502, nombre: 'Lechuga Crespa', precio: 'Bs. 3.00', description: 'Lechuga hidropónica.', image: '/images/lechuga.png' }, ],
+    lacteos: [ { id: 601, nombre: 'Leche PIL 1L', precio: 'Bs. 6.00', description: 'Leche entera pasteurizada.', image: '/images/leche.png' }, { id: 602, nombre: 'Yogurt Bebible 1L', precio: 'Bs. 12.00', description: 'Yogurt sabor frutilla.', image: '/images/yogurt.png' }, ],
+    panaderia: [ { id: 701, nombre: 'Pan Molde Blanco', precio: 'Bs. 10.00', description: 'Pan suave para sandwich.', image: '/images/pan.png' }, { id: 702, nombre: 'Pan Integral', precio: 'Bs. 12.00', description: 'Alto en fibra.', image: '/images/pan_integral.png' }, ],
+    limpieza: [ { id: 801, nombre: 'Lavandina 1L', precio: 'Bs. 5.00', description: 'Desinfectante potente.', image: '/images/lavandina.png' }, { id: 802, nombre: 'Detergente OMO', precio: 'Bs. 15.00', description: 'Detergente en polvo.', image: '/images/detergente.png' }, ],
+    personal: [ { id: 901, nombre: 'Shampoo Sedal', precio: 'Bs. 22.00', description: 'Para cabello liso.', image: '/images/shampoo.png' }, { id: 902, nombre: 'Jabón Lux (Pack 3)', precio: 'Bs. 10.00', description: 'Jabón de tocador.', image: '/images/jabon.png' }, ],
+    cereales: [ { id: 1001, nombre: 'Galletas Mabel', precio: 'Bs. 4.00', description: 'Galletas de agua.', image: '/images/galletas.png' }, { id: 1002, nombre: 'Cereal Chocapic', precio: 'Bs. 25.00', description: 'Cereal de chocolate.', image: '/images/cereal.png' }, ],
+  };
+
+  // Lista de categorías
+  const categoriesList = [
+    { key: 'abarrotes', label: 'Abarrotes' },
+    { key: 'bebidas', label: 'Bebidas' },
+    { key: 'carnes', label: 'Carnes' },
+    { key: 'frutas', label: 'Frutas' },
+    { key: 'verduras', label: 'Verduras' },
+    { key: 'lacteos', label: 'Lácteos' },
+    { key: 'panaderia', label: 'Panadería' },
+    { key: 'limpieza', label: 'Limpieza' },
+    { key: 'personal', label: 'Personal' },
+    { key: 'cereales', label: 'Cereales' },
+  ];
 
   return (
     <div className={styles.container}>
@@ -237,7 +281,11 @@ export default function HomePage() {
           <input type="text" placeholder="¿Qué estás buscando?" className={styles.searchBar} />
           <div className={styles.userNav}>
             <span>Cuenta</span>
-            <span>Carrito</span>
+            <div className={styles.cartContainer} onClick={handleGoToCart}>
+              <span className={styles.cartIcon}>🛒</span>
+              {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
+              <span style={{ marginLeft: '8px' }}>Carrito</span>
+            </div>
           </div>
         </div>
       </header>
@@ -254,35 +302,35 @@ export default function HomePage() {
         </div>
 
         <div className={styles.categoryBar}>
-          <span onClick={() => handleScrollTo(abarrotesRef)} className={styles.categoryLink}>Abarrotes</span>
-          <span onClick={() => handleScrollTo(bebidasRef)} className={styles.categoryLink}>Bebidas</span>
-          <span onClick={() => handleScrollTo(carnesRef)} className={styles.categoryLink}>Carnes</span>
-          <span onClick={() => handleScrollTo(frutasRef)} className={styles.categoryLink}>Frutas</span>
-          <span onClick={() => handleScrollTo(verdurasRef)} className={styles.categoryLink}>Verduras</span>
-          <span onClick={() => handleScrollTo(lacteosRef)} className={styles.categoryLink}>Lácteos</span>
-          <span onClick={() => handleScrollTo(panaderiaRef)} className={styles.categoryLink}>Panadería</span>
-          <span onClick={() => handleScrollTo(limpiezaRef)} className={styles.categoryLink}>Limpieza</span>
-          <span onClick={() => handleScrollTo(cuidadoPersonalRef)} className={styles.categoryLink}>Personal</span>
-          <span onClick={() => handleScrollTo(cerealesRef)} className={styles.categoryLink}>Cereales</span>
+          {categoriesList.map((cat) => (
+            <span 
+              key={cat.key}
+              onClick={() => handleScrollTo(cat.key)} 
+              // Comparamos la categoría activa con la clave de la lista
+              className={`${styles.categoryLink} ${activeCategory === cat.key ? styles.categoryLinkActive : ''}`}
+            >
+              {cat.label}
+            </span>
+          ))}
         </div>
 
         <div className={styles.shelfContainer}>
-          <ProductShelf title="Abarrotes" products={productData.abarrotes} forwardRef={abarrotesRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Bebidas" products={productData.bebidas} forwardRef={bebidasRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Carnes" products={productData.carnes} forwardRef={carnesRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Frutas y Verduras" products={productData.frutas} forwardRef={frutasRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Verduras" products={productData.verduras} forwardRef={verdurasRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Lácteos" products={productData.lacteos} forwardRef={lacteosRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Panadería" products={productData.panaderia} forwardRef={panaderiaRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Limpieza" products={productData.limpieza} forwardRef={limpiezaRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Cuidado Personal" products={productData.cuidadoPersonal} forwardRef={cuidadoPersonalRef} onProductClick={handleProductClick} />
-          <ProductShelf title="Cereales" products={productData.cereales} forwardRef={cerealesRef} onProductClick={handleProductClick} />
+          {categoriesList.map((cat) => (
+              <ProductShelf 
+                key={cat.key}
+                id={cat.key} // PASAMOS EL ID AQUÍ
+                title={cat.label} 
+                products={productData[cat.key] || []} 
+                forwardRef={categoryRefs[cat.key as keyof typeof categoryRefs]} 
+                onProductClick={handleProductClick}
+                onAddToCart={handleAddToCart} 
+              />
+          ))}
         </div>
       </section>
 
-      {isModalOpen && (
-        <ProductModal product={selectedProduct} onClose={() => setIsModalOpen(false)} />
-      )}
+      {isDetailOpen && <ProductModal product={selectedProduct} onClose={() => setIsDetailOpen(false)} onAddToCart={handleAddToCart} />}
+      <ConfirmationModal isOpen={isConfirmationOpen} onKeepShopping={handleKeepShopping} onGoToCart={handleGoToCart} />
     </div>
   );
 }
