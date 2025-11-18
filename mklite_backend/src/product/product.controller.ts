@@ -25,8 +25,8 @@ export class ProductController {
         return this.productService.getProductsBySupplier(params.id_supplier);
     }
 
-    @Get('/catalog/all')
-    getCatalog() {
-    return this.productService.getCatalog();
-}
+    @Get('/catalog/category/:id')
+    getCatalogByCategory(@Param() params: any) {
+    return this.productService.getCatalogByCategory(Number(params.id));
+    }
 }

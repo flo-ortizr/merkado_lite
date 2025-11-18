@@ -20,17 +20,18 @@ export class ProductService {
         return await AppDataSource.manager.find("Product", {where: {supplier: {id_supplier: id_supplier}}});
     }
     //================================================ mostrar con su categoria 
-    async getCatalog() {
-    const categories = await AppDataSource.manager.find(Category, {
+    async getCatalogByCategory(categoryId: number) {
+    const category = await AppDataSource.manager.findOne(Category, {
         relations: ['products'],
         where: {
+            id_category: categoryId,
             products: {
                 status: 'active'
             }
         }
     });
     
-    return categories;
-}
+    return category;
+    }
 
 }
