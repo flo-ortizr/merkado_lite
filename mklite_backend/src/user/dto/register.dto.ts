@@ -10,4 +10,6 @@ export class CreateUserDto {
 
   @IsString()
   name: string;
+
+  //nombre, ci, telf
 }

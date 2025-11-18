@@ -23,7 +23,7 @@ export class UserService {
 
     // 3. Buscar rol "cliente"
     const clientRole = await AppDataSource.manager.findOneBy(Role, {
-      name: 'cliente',
+      name: 'Cliente',
     });
 
     if (!clientRole) {
