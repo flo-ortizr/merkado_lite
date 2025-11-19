@@ -100,7 +100,7 @@ export default function CartPage() {
                     <div className={styles.itemDetails}>
                       <h3>{item.nombre}</h3>
                       
-                      {/* Selector de Cantidad AQUÍ */}
+                      {/* Selector de Cantidad - ¡AQUÍ ESTÁ LA LÓGICA! */}
                       <div className={styles.qtySelector}>
                         <button onClick={() => updateQuantity(item.id, -1)} className={styles.qtyBtn}>-</button>
                         <span className={styles.qtyValue}>{item.quantity}</span>
@@ -149,7 +149,7 @@ export default function CartPage() {
 
             <button 
               className={styles.checkoutButton} 
-              onClick={() => router.push('/checkout')}
+              onClick={() => router.push('/compra')}
             >
               Continuar
             </button>
