@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { loginUser } from "./loginService";
-import styles from "../app/login/LoginPage.module.css";
+import LoginModel from "./login.model";
+import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,11 +25,13 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await loginUser({ email, password });
+      const data: LoginModel = { email, password };
+      const response = await loginUser(data);
+
       localStorage.setItem("token", response.token);
       router.push("/Home");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Credenciales incorrectas");
+      setError(err.message || "Credenciales incorrectas");
     } finally {
       setLoading(false);
     }
@@ -57,14 +60,19 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
             />
+
             {error && <p className={styles.error}>{error}</p>}
+
             <button type="submit" className={styles.button} disabled={loading}>
               {loading ? "Iniciando..." : "Iniciar sesión"}
             </button>
           </form>
 
           <div className="text-center mt-4">
-            <a href="/Register" className="text-red-600 font-medium hover:text-red-800 transition">
+            <a
+              href="/Register"
+              className="text-red-600 font-medium hover:text-red-800 transition"
+            >
               Crear cuenta
             </a>
           </div>

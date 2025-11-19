@@ -1,9 +1,6 @@
-export interface LoginData {
-  email: string;
-  password: string;
-}
+import LoginModel from "./login.model";
 
-export async function loginUser(data: LoginData) {
+export const loginUser = async (data: LoginModel) => {
   const response = await fetch("http://localhost:3000/auth/login", {
     method: "POST",
     headers: {
@@ -18,4 +15,4 @@ export async function loginUser(data: LoginData) {
   }
 
   return await response.json(); // { message, token, user }
-}
+};
