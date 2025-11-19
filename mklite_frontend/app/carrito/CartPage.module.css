@@ -1,0 +1,257 @@
+/* app/carrito/CartPage.module.css */
+
+.container {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #f4f4f4;
+  min-height: 100vh;
+}
+
+/* --- Header --- */
+.header {
+  background-color: #E60012;
+  color: #fff;
+  padding: 15px 0;
+  box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo {
+  font-weight: 900;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: -1px;
+}
+
+/* --- Contenido Principal --- */
+.main {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2 partes productos, 1 parte resumen */
+  gap: 30px;
+}
+
+/* --- Sección Izquierda (Lista) --- */
+.cartSection {
+  background: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 0;
+}
+
+.headerRow {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  border-bottom: 2px solid #f0f0f0; 
+  padding-bottom: 15px; 
+  margin-bottom: 20px;
+}
+
+.clearBtn {
+  color: #E60012; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.clearBtn:hover {
+  text-decoration: underline;
+}
+
+/* --- Item del Carrito --- */
+.cartItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.itemInfo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.imageContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.itemDetails h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+/* Selector de Cantidad (Estilo Home) */
+.qtySelector {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f4f4f4;
+  border-radius: 20px;
+  padding: 2px;
+  border: 1px solid #e0e0e0;
+}
+
+.qtyBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  transition: background-color 0.2s;
+}
+
+.qtyBtn:hover {
+  background-color: #e0e0e0;
+}
+
+.qtyValue {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  min-width: 25px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+/* Precio y Eliminar */
+.itemActions {
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-end; 
+  gap: 10px;
+}
+
+.itemPrice {
+  font-size: 18px;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.deleteBtn {
+  background: none; 
+  border: none; 
+  color: #999; 
+  cursor: pointer; 
+  font-size: 13px; 
+  text-decoration: underline;
+}
+
+.deleteBtn:hover {
+  color: #E60012;
+}
+
+/* --- Sección Derecha (Resumen) --- */
+.summarySection {
+  background: #fff;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  height: fit-content;
+  position: sticky;
+  top: 90px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #555;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+  font-size: 24px;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+/* --- Botones --- */
+.checkoutButton {
+  background-color: #E60012;
+  color: #fff;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 10px rgba(230, 0, 18, 0.2);
+}
+
+.checkoutButton:hover {
+  background-color: #cc000f;
+}
+
+.backButton {
+  background-color: transparent;
+  color: #666;
+  border: 2px solid #ddd;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+}
+
+.emptyMessage {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.emptyText {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 20px;
+}
