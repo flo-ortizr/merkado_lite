@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { AppDataSource } from "src/data-source";
 import { Category } from '../category/category.entity';
 import { Product } from "./product.entity";
+import { Supplier } from "../supplier/supplier.entity";
+import { CreateProductDto } from "./dto/create_product.dto";
 
 @Injectable()
 export class ProductService {
@@ -50,5 +52,26 @@ export class ProductService {
             where: { id_product: id },
             relations: ['category'],
         });
+    }
+
+    async createProduct(dto: CreateProductDto){
+        const category = await AppDataSource.manager.findOne(Category, {where: {id_category: dto.id_category}});
+        if(!category) throw new Error('Categoria no econtrada');
+
+        const supplier = await AppDataSource.manager.findOne(Supplier, {where: {id_supplier: dto.id_supplier}});
+        if(!supplier) throw new Error('Proveedor no econtrado');
+
+        const product = AppDataSource.manager.create(Product, {
+            name: dto.name,
+            description: dto.description,
+            price: dto.price,
+            expiration_date: dto.expiration_date,
+            status: dto.status || 'active',
+            category: category,
+            supplier: supplier,
+            image_url: dto.image_url,
+        });
+
+        return await AppDataSource.manager.save(Product, product);
     }
 }
