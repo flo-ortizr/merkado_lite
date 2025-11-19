@@ -4,6 +4,7 @@ import { Category } from '../category/category.entity';
 import { Product } from "./product.entity";
 import { Supplier } from "../supplier/supplier.entity";
 import { CreateProductDto } from "./dto/create_product.dto";
+import { UpdateProductDto } from "./dto/update_product.dto";
 
 @Injectable()
 export class ProductService {
@@ -74,4 +75,27 @@ export class ProductService {
 
         return await AppDataSource.manager.save(Product, product);
     }
+
+    async updateProduct(id: number, dto: UpdateProductDto){
+        const product = await AppDataSource.manager.findOne(Product, {where: {id_product: id}});
+        if(!product) throw new Error('Producto no encontrado');
+
+        if(dto.id_category){
+            const category = await AppDataSource.manager.findOne(Category, {where: {id_category: dto.id_category}});
+            if(!category) throw new Error('Categoria no econtrada');
+            product.category = category;
+        }
+
+        if(dto.id_supplier){
+            const supplier = await AppDataSource.manager.findOne(Supplier, {where: {id_supplier: dto.id_supplier}});
+            if(!supplier) throw new Error('Proveedor no econtrado');
+            product.supplier = supplier;
+        }
+
+        Object.assign(product, dto);
+        
+        return await AppDataSource.manager.save(Product, product);
+    }
+
+    
 }
