@@ -24,4 +24,9 @@ export class ProductController {
     getProductsBySupplier(@Param() params: any) {
         return this.productService.getProductsBySupplier(params.id_supplier);
     }
+
+    @Get('/catalog/category/:id')
+    getCatalogByCategory(@Param() params: any) {
+    return this.productService.getCatalogByCategory(Number(params.id));
+    }
 }
