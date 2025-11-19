@@ -40,10 +40,15 @@ export class ProductService {
     }
 
     async getAllProducts() {
-        return await AppDataSource.manager.find(Product);
+        return await AppDataSource.manager.find(Product, {
+            relations: ['category']
+        });
     }
 
     async getProductById(id: number) {
-        return await AppDataSource.manager.findOneBy(Product, {id_product: id});
+        return await AppDataSource.manager.findOne(Product, {
+            where: { id_product: id },
+            relations: ['category'],
+        });
     }
 }
