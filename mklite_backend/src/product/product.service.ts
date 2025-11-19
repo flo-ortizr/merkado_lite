@@ -97,5 +97,11 @@ export class ProductService {
         return await AppDataSource.manager.save(Product, product);
     }
 
-    
+    async deleteProduct(id: number){
+        const result = await AppDataSource.manager.delete(Product, {id_product: id});
+
+        if(result.affected === 0) throw new Error('Producto no encontrado');
+
+        return {message: 'Producto eliminado correctamente'};
+    }
 }
