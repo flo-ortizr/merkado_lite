@@ -22,9 +22,10 @@
 @media (min-width: 768px) {
   .rightSide {
     display: flex;
-    align-items: center;
+    width: 50%;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.3);
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(5px);
   }
 }
