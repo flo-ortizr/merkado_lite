@@ -19,7 +19,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  // --- ESTADOS PARA EL CUPÓN ---
+  // Estados para el cupón
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [couponMsg, setCouponMsg] = useState<{ text: string, type: 'success' | 'error' | '' }>({ text: '', type: '' });
@@ -27,33 +27,40 @@ export default function CartPage() {
   useEffect(() => {
     setIsClient(true);
     const storedCart = localStorage.getItem('mklite_cart');
+    
+    // Al entrar al carrito, limpiamos cualquier rastro anterior de descuento para evitar errores visuales
+    // El usuario debe volver a aplicarlo si recarga la página (o podrías guardarlo si prefieres)
+    localStorage.removeItem('mklite_discount_applied'); 
+
     if (storedCart) {
       setCartItems(JSON.parse(storedCart));
     }
   }, []);
 
-  // Calcular Subtotal
+  // Cálculos
   const subtotal = cartItems.reduce((sum, item) => sum + (item.priceNumeric * item.quantity), 0);
-  
-  // Calcular Total Final (Subtotal - Descuento)
   const total = subtotal - discount;
 
-  // Función para aplicar cupón
+  // --- LÓGICA DEL CUPÓN ---
   const handleApplyCoupon = () => {
     if (!couponCode) return;
 
-    // Lógica del cupón "LITE10"
+    // Validamos el código "LITE10"
     if (couponCode.toUpperCase() === 'LITE10') {
-      const calcDiscount = subtotal * 0.10; // 10% de descuento
+      const calcDiscount = subtotal * 0.10; // 10%
       setDiscount(calcDiscount);
       setCouponMsg({ text: '¡Cupón del 10% aplicado!', type: 'success' });
+      
+      // GUARDAMOS EN MEMORIA QUE HAY DESCUENTO PARA LA SIGUIENTE PÁGINA
+      localStorage.setItem('mklite_discount_applied', 'true');
+      
     } else {
       setDiscount(0);
       setCouponMsg({ text: 'Cupón no válido', type: 'error' });
+      localStorage.removeItem('mklite_discount_applied');
     }
   };
 
-  // Actualizar cantidad
   const updateQuantity = (id: number, delta: number) => {
     const newCart = cartItems.map(item => {
       if (item.id === id) {
@@ -65,28 +72,30 @@ export default function CartPage() {
     setCartItems(newCart);
     localStorage.setItem('mklite_cart', JSON.stringify(newCart));
     
-    // Si cambian las cantidades, reiniciamos el cupón para evitar cálculos incorrectos
+    // Si se cambia la cantidad, reseteamos el cupón por seguridad
     if (discount > 0) {
        setDiscount(0);
        setCouponMsg({ text: 'El carrito cambió, vuelve a aplicar tu cupón', type: 'error' });
        setCouponCode('');
+       localStorage.removeItem('mklite_discount_applied');
     }
   };
 
-  // Eliminar item
   const removeItem = (id: number) => {
     const newCart = cartItems.filter(item => item.id !== id);
     setCartItems(newCart);
     localStorage.setItem('mklite_cart', JSON.stringify(newCart));
-    setDiscount(0); // Reset descuento
+    
+    setDiscount(0);
     setCouponMsg({ text: '', type: '' });
+    localStorage.removeItem('mklite_discount_applied');
   };
 
-  // Vaciar carrito
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem('mklite_cart');
     setDiscount(0);
+    localStorage.removeItem('mklite_discount_applied');
   };
 
   if (!isClient) return null;
@@ -102,8 +111,7 @@ export default function CartPage() {
       </header>
 
       <main className={styles.main}>
-        
-        {/* Sección Izquierda: Lista de Productos */}
+        {/* Columna Izquierda: Lista */}
         <div className={styles.cartSection}>
           <div className={styles.headerRow}>
              <h1 className={styles.sectionTitle}>Tu Carrito ({cartItems.length})</h1>
@@ -155,7 +163,7 @@ export default function CartPage() {
           )}
         </div>
 
-        {/* Sección Derecha: Resumen */}
+        {/* Columna Derecha: Resumen */}
         {cartItems.length > 0 && (
           <div className={styles.summarySection}>
             <h2 className={styles.sectionTitle}>Resumen</h2>
@@ -169,7 +177,7 @@ export default function CartPage() {
               <span>Gratis</span>
             </div>
 
-            {/* --- NUEVA SECCIÓN: CUPÓN DE DESCUENTO --- */}
+            {/* Input de Cupón */}
             <div className={styles.couponContainer}>
               <span className={styles.couponLabel}>¿Tienes un cupón de descuento?</span>
               <div className={styles.couponInputGroup}>
@@ -182,7 +190,6 @@ export default function CartPage() {
                 />
                 <button onClick={handleApplyCoupon} className={styles.applyBtn}>Aplicar</button>
               </div>
-              {/* Mensaje de feedback */}
               {couponMsg.text && (
                 <div className={`${styles.couponMessage} ${couponMsg.type === 'success' ? styles.msgSuccess : styles.msgError}`}>
                   {couponMsg.text}
@@ -190,7 +197,6 @@ export default function CartPage() {
               )}
             </div>
 
-            {/* Fila de Descuento (Solo si hay descuento) */}
             {discount > 0 && (
               <div className={styles.discountRow}>
                 <span>Descuento</span>
@@ -211,7 +217,6 @@ export default function CartPage() {
             </button>
           </div>
         )}
-
       </main>
     </div>
   );
