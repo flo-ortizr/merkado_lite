@@ -12,12 +12,6 @@ export class Customer {
   @JoinColumn({ name: 'id_user' })
   user: User;
 
-  @Column()
-  address: string;
-
-  @Column({ type: 'enum', enum: ['frequent', 'occasional'], default: 'occasional' })
-  customer_type: string;
-
   @OneToMany(() => Order, (order) => order.customer)
   orders: Order[];
 
