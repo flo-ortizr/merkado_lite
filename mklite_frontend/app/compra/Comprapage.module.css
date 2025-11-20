@@ -66,7 +66,7 @@
 }
 
 .tabItemActive {
-  color: #E60012; /* Texto activo en rojo Coca-Cola */
+  color: #E60012; 
 }
 
 .tabItemActive::after {
@@ -76,7 +76,7 @@
   left: 0;
   width: 100%;
   height: 3px;
-  background-color: #E60012; /* Subrayado rojo Coca-Cola */
+  background-color: #E60012;
   border-radius: 2px;
 }
 
@@ -92,9 +92,6 @@
   margin-bottom: 25px;
   border-bottom: 2px solid #f3f4f6;
   padding-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
 }
 
 /* Inputs y Selects */
@@ -132,11 +129,11 @@
 
 .inputGrid {
   display: grid;
-  grid-template-columns: 1fr 0.8fr 0.8fr; /* Calle, Número, Dpto/Piso */
+  grid-template-columns: 1fr 0.8fr 0.8fr;
   gap: 20px;
 }
 
-/* Radio Buttons Personalizados */
+/* Radio Buttons */
 .radioOptionContainer {
     margin-bottom: 15px;
 }
@@ -159,7 +156,6 @@
 
 .radioOption input[type="radio"] {
   -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   width: 20px;
   height: 20px;
@@ -302,7 +298,7 @@
   color: #1a1a1a;
 }
 
-/* Clase para texto de descuento en rojo */
+/* Texto del Descuento en Rojo */
 .discountText {
   color: #E60012 !important;
   font-weight: bold;
@@ -324,7 +320,7 @@
   color: #E60012;
 }
 
-/* --- Botones de Navegación --- */
+/* --- Botones Navegación --- */
 .navigationButtons {
   display: flex;
   justify-content: space-between;
@@ -354,7 +350,7 @@
 }
 
 .nextButton {
-  background-color: #E60012; /* Rojo Coca-Cola */
+  background-color: #E60012;
   color: #fff;
 }
 
@@ -382,120 +378,39 @@
   text-decoration: none;
 }
 
-.footer a:hover {
-  text-decoration: underline;
-  color: #555;
-}
+/* --- NUEVOS ESTILOS: MAPA INCRUSTADO (EMBEDDED) --- */
+/* Reemplaza a los estilos de modal antiguos */
 
-/* --- Map Modal --- */
-.mapModalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
+.embeddedMapContainer {
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-.mapModalContent {
-    background-color: #fff;
-    padding: 20px;
+    height: 350px; /* Altura fija para que se vea bien siempre */
+    background-color: #e0e0e0; /* Fondo gris mientras carga */
     border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    position: relative;
-}
-
-.mapModalCloseButton {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    border: none;
-    background: none;
-    font-size: 20px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.mapModalTitle {
-    margin-top: 0;
     margin-bottom: 15px;
-    font-size: 18px;
-}
-
-.interactiveMapPlaceholder {
-    width: 100%;
-    height: 300px;
-    background-color: #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.mapModalInfo {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 20px;
-}
-
-.mapModalConfirmButton {
-    width: 100%;
-    padding: 12px;
-    background-color: #E60012;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Map Thumbnail in Form */
-.mapThumbnailContainer {
-    margin-top: 15px;
-    cursor: pointer;
-}
-
-.mapThumbnail {
-    position: relative;
-    width: 100%;
-    height: 150px;
-    background-color: #eee;
-    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
+    cursor: crosshair; /* Cursor de mira para mayor precisión */
 }
 
-.mapOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.3);
+.mapInstructions {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+.loadingMap {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    height: 100%;
+    color: #666;
     font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.mapThumbnail:hover .mapOverlay {
-    opacity: 1;
-}
-
-.mapClickInfo {
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px;
-    margin-bottom: 15px;
+    background-color: #f0f0f0;
 }
 
 .datePickerInput {

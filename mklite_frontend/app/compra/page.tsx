@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Comprapage.module.css';
@@ -19,35 +19,121 @@ export default function CompraPage() {
   const [activeTab, setActiveTab] = useState(0);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery');
-  const [address, setAddress] = useState({ street: 'Calle Falsa', number: '123', apartment: '', recipient: 'Fabio Arze' });
+  
+  // Estado de dirección
+  const [address, setAddress] = useState({ street: '', number: '', apartment: '', recipient: 'Fabio Arze' });
   const [deliveryDetails, setDeliveryDetails] = useState({ date: '19/11/2025', time: '13:00-15:00' }); 
-  
-  // ESTADO PARA EL DESCUENTO
   const [discountAmount, setDiscountAmount] = useState(0);
-  
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
+  // Referencias del Mapa
+  const mapRef = useRef<any>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const markerRef = useRef<any>(null);
+
+  // 1. Cargar scripts (Leaflet) y carrito al iniciar
   useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.async = true;
+    document.head.appendChild(script);
+
     const storedCart = localStorage.getItem('mklite_cart');
     if (storedCart) {
         const parsedCart = JSON.parse(storedCart);
         setCartItems(parsedCart);
-
-        // 1. Calculamos el subtotal temporalmente
         const tempSubtotal = parsedCart.reduce((acc: number, item: CartItem) => acc + item.priceNumeric * item.quantity, 0);
         
-        // 2. VERIFICAMOS SI VIENE CON DESCUENTO DESDE EL CARRITO
         const discountApplied = localStorage.getItem('mklite_discount_applied'); 
-        
         if (discountApplied === 'true') {
-            setDiscountAmount(tempSubtotal * 0.10); // Aplicamos el 10%
+            setDiscountAmount(tempSubtotal * 0.10);
         }
     } else {
         router.push('/carrito');
     }
+
+    return () => {
+      if (document.head.contains(link)) document.head.removeChild(link);
+      if (document.head.contains(script)) document.head.removeChild(script);
+    };
   }, [router]);
 
-  // Cálculos finales
+  // 2. Inicializar Mapa (ESTILO ESTÉTICO "VOYAGER")
+  useEffect(() => {
+    if (activeTab === 0 && deliveryMethod === 'delivery') {
+      const checkLeaflet = setInterval(() => {
+        if ((window as any).L && mapContainerRef.current && !mapRef.current) {
+          clearInterval(checkLeaflet);
+          const L = (window as any).L;
+          
+          // Coordenadas Cochabamba
+          const initialCoords = [-17.3935, -66.1570];
+          const map = L.map(mapContainerRef.current).setView(initialCoords, 15);
+
+          // --- AQUÍ ESTÁ EL CAMBIO PARA QUE SE VEA ESTÉTICO ---
+          // Usamos CartoDB Voyager en lugar de OpenStreetMap por defecto
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(map);
+
+          const icon = L.icon({
+             iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+             iconSize: [25, 41],
+             iconAnchor: [12, 41],
+             popupAnchor: [1, -34],
+          });
+
+          // --- Función para obtener nombre de calle (API) ---
+          const fetchAddress = async (lat: number, lng: number) => {
+            setAddress(prev => ({...prev, street: 'Cargando dirección...'}));
+            try {
+              const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+              const data = await response.json();
+              
+              const road = data.address?.road || data.address?.pedestrian || data.address?.suburb || 'Ubicación seleccionada';
+              const houseNumber = data.address?.house_number || '';
+
+              setAddress(prev => ({
+                ...prev, 
+                street: road,
+                number: houseNumber || prev.number
+              }));
+            } catch (error) {
+              setAddress(prev => ({...prev, street: 'Ubicación seleccionada'}));
+            }
+          };
+
+          map.on('click', function(e: any) {
+             const { lat, lng } = e.latlng;
+             if (markerRef.current) {
+                markerRef.current.setLatLng([lat, lng]);
+             } else {
+                markerRef.current = L.marker([lat, lng], { icon: icon }).addTo(map);
+             }
+             fetchAddress(lat, lng);
+          });
+
+          mapRef.current = map;
+        }
+      }, 100);
+
+      return () => clearInterval(checkLeaflet);
+    } else {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        markerRef.current = null;
+      }
+    }
+  }, [activeTab, deliveryMethod]);
+
   const subtotal = cartItems.reduce((acc, item) => acc + item.priceNumeric * item.quantity, 0);
   const deliveryCost = deliveryMethod === 'delivery' ? 10.00 : 0; 
   const total = subtotal - discountAmount + deliveryCost;
@@ -55,11 +141,10 @@ export default function CompraPage() {
   const handleNextStep = () => {
     if (activeTab < 1) setActiveTab(prev => prev + 1);
     else {
-      alert('Simulando pago y completando compra...');
-      // Limpiamos todo al terminar
+      alert('Compra realizada con éxito!');
       localStorage.removeItem('mklite_cart');
       localStorage.removeItem('mklite_discount_applied');
-      router.push('/Home'); // Redirige al Home o a una pagina de confirmación
+      router.push('/Home');
     }
   };
 
@@ -78,16 +163,13 @@ export default function CompraPage() {
 
       <main className={styles.mainContent}>
         <div className={styles.checkoutForms}>
-          {/* TABS */}
           <nav className={styles.tabsNav}>
             <span className={`${styles.tabItem} ${activeTab === 0 ? styles.tabItemActive : ''}`} onClick={() => setActiveTab(0)}>MÉTODO DE ENTREGA</span>
             <span className={`${styles.tabItem} ${activeTab === 1 ? styles.tabItemActive : ''}`} onClick={() => setActiveTab(1)}>MÉTODO DE PAGO</span>
           </nav>
 
-          {/* TAB 1: ENTREGA */}
           {activeTab === 0 && (
             <div className={styles.formSection}>
-              {/* Título sin emoji */}
               <h2 className={styles.sectionTitle}>Método de entrega</h2>
               
               <div className={styles.radioOptionContainer}>
@@ -107,53 +189,64 @@ export default function CompraPage() {
 
               {deliveryMethod === 'delivery' && (
                 <>
-                  <h3 className={styles.sectionTitle} style={{fontSize: '20px', marginTop: '30px'}}>Día y Hora</h3>
-                  <div className={styles.formGroup}>
-                      <label>Día</label>
-                      <input type="text" value={deliveryDetails.date} className={styles.datePickerInput} onChange={(e) => setDeliveryDetails({...deliveryDetails, date: e.target.value})} />
-                  </div>
-                   <div className={styles.formGroup}>
-                        <label>Hora</label>
-                        <select value={deliveryDetails.time} onChange={(e) => setDeliveryDetails({...deliveryDetails, time: e.target.value})} className={styles.datePickerInput}>
-                            <option value="09:00-11:00">09:00 - 11:00</option>
-                            <option value="11:00-13:00">11:00 - 13:00</option>
-                        </select>
-                   </div>
-                 
-                  <h3 className={styles.sectionTitle} style={{fontSize: '20px', marginTop: '30px'}}>Ubicación</h3>
-                  <div className={styles.mapThumbnailContainer} onClick={() => setIsMapModalOpen(true)}>
-                    <div className={styles.mapThumbnail}>
-                        <div className={styles.mapOverlay}><span>Seleccionar Ubicación</span></div>
-                    </div>
-                  </div>
+                  <h3 className={styles.sectionTitle} style={{marginTop: '30px'}}>Ubicación de entrega</h3>
                   
-                  <div className={styles.inputGrid} style={{marginTop: '20px'}}>
+                  {/* MAPA INCRUSTADO */}
+                  <div id="embedded-map" ref={mapContainerRef} className={styles.embeddedMapContainer}>
+                    <div className={styles.loadingMap}>Cargando mapa...</div>
+                  </div>
+                  <p className={styles.mapInstructions}>Haz clic en el mapa para autocompletar la dirección exacta.</p>
+                  
+                  <div className={styles.inputGrid}>
                     <div className={styles.formGroup}>
                       <label>Calle</label>
-                      <input type="text" value={address.street} onChange={(e) => setAddress({...address, street: e.target.value})} />
+                      <input 
+                        type="text" 
+                        value={address.street} 
+                        onChange={(e) => setAddress({...address, street: e.target.value})} 
+                        placeholder="Selecciona en el mapa o escribe aquí" 
+                      />
                     </div>
                     <div className={styles.formGroup}>
                       <label>Número</label>
-                      <input type="text" value={address.number} onChange={(e) => setAddress({...address, number: e.target.value})} />
+                      <input 
+                        type="text" 
+                        value={address.number} 
+                        onChange={(e) => setAddress({...address, number: e.target.value})} 
+                        placeholder="123" 
+                      />
                     </div>
                     <div className={styles.formGroup}>
                       <label>Dpto/Piso</label>
                       <input type="text" value={address.apartment} onChange={(e) => setAddress({...address, apartment: e.target.value})} placeholder="Opcional" />
                     </div>
                   </div>
+
+                  <h3 className={styles.sectionTitle} style={{marginTop: '20px'}}>Detalles</h3>
                   <div className={styles.formGroup}>
                     <label>Destinatario</label>
                     <input type="text" value={address.recipient} onChange={(e) => setAddress({...address, recipient: e.target.value})} />
+                  </div>
+                  <div className={styles.inputGrid}>
+                    <div className={styles.formGroup}>
+                        <label>Día de Entrega</label>
+                        <input type="text" value={deliveryDetails.date} className={styles.datePickerInput} onChange={(e) => setDeliveryDetails({...deliveryDetails, date: e.target.value})} />
+                    </div>
+                    <div className={styles.formGroup}>
+                          <label>Hora</label>
+                          <select value={deliveryDetails.time} onChange={(e) => setDeliveryDetails({...deliveryDetails, time: e.target.value})} className={styles.datePickerInput}>
+                              <option value="09:00-11:00">09:00 - 11:00</option>
+                              <option value="11:00-13:00">11:00 - 13:00</option>
+                          </select>
+                    </div>
                   </div>
                 </>
               )}
             </div>
           )}
 
-          {/* TAB 2: PAGO */}
           {activeTab === 1 && (
             <div className={styles.formSection}>
-              {/* Título sin emoji */}
               <h2 className={styles.sectionTitle}>Método de pago</h2>
               <div className={styles.radioOptionContainer}>
                 <div className={styles.radioOption}>
@@ -210,15 +303,12 @@ export default function CompraPage() {
                     <strong>Bs. {deliveryCost.toFixed(2)}</strong>
                 </div>
             )}
-
-            {/* AQUÍ SE MUESTRA EL DESCUENTO SI EXISTE */}
             {discountAmount > 0 && (
                 <div className={styles.summaryTotalRow}>
-                    <span style={{color: '#E60012', fontWeight: 'bold'}}>Descuento (LITE10):</span>
-                    <strong style={{color: '#E60012', fontWeight: 'bold'}}>- Bs. {discountAmount.toFixed(2)}</strong>
+                    <span className={styles.discountText}>Descuento (LITE10):</span>
+                    <strong className={styles.discountText}>- Bs. {discountAmount.toFixed(2)}</strong>
                 </div>
             )}
-            
             <div className={styles.summaryTotalFinal}>
               <span>TOTAL</span>
               <span>Bs. {total.toFixed(2)}</span>
@@ -227,17 +317,11 @@ export default function CompraPage() {
         </div>
       </main>
 
-      {/* MODAL DE MAPA */}
-      {isMapModalOpen && (
-        <div className={styles.mapModalBackdrop} onClick={() => setIsMapModalOpen(false)}>
-          <div className={styles.mapModalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.mapModalCloseButton} onClick={() => setIsMapModalOpen(false)}>X</button>
-            <h3>Selecciona tu Ubicación</h3>
-            <div className={styles.interactiveMapPlaceholder}>Mapa Interactivo (Placeholder)</div>
-            <button className={styles.mapModalConfirmButton} onClick={() => setIsMapModalOpen(false)}>Confirmar</button>
-          </div>
-        </div>
-      )}
+      <footer className={styles.footer}>
+        <span>© ic norte 2023. todos los derechos reservados.</span>
+        <a href="/politica-de-privacidad">Política de Privacidad</a>
+        <a href="/terminos-y-condiciones">Términos y Condiciones</a>
+      </footer>
     </div>
   );
 }
