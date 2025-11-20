@@ -27,11 +27,4 @@ export class UserController {
     deleteUser(@Param() params : any){
         return this.userService.DeleteUser(params.id);
     }
-
-    @Put('/:id')
-  updateUser(
-    @Param('id') id: number,
-    @Body() userData: Partial<CreateUserDto>) {
-    return this.userService.UpdateUser(id, userData);
-  }
 }

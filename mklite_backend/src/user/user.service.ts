@@ -50,10 +50,6 @@ export class UserService {
   async getUserById(id: number) {
     return await AppDataSource.manager.findOneBy(User, { id_user: id });
   }
-  
-   async UpdateUser(id: number, data: Partial<CreateUserDto>) {
-    return AppDataSource.manager.update(User, { id_user: id }, data);
-  }
 
   async DeleteUser(id: number) {
     return await AppDataSource.manager.delete(User, { id_user: id });
