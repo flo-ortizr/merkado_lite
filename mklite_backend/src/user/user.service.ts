@@ -2,6 +2,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { User } from './user.entity';
+import { Customer } from '../customer/customer.entity';
 import { Role } from '../role/role.entity';
 import { CreateUserDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
@@ -39,8 +40,14 @@ export class UserService {
       role: clientRole,
     });
 
-    // 5. Guardar usuario
-    return AppDataSource.manager.save(User, newUser);
+    const savedUser = await AppDataSource.manager.save(User, newUser);
+    // ⭐ 5. Crear automáticamente su Customer
+    const newCustomer = AppDataSource.manager.create(Customer, {
+    user: savedUser
+ });
+
+  await AppDataSource.manager.save(Customer, newCustomer);
+  return savedUser;
   }
 
   async getAllUsers() {
