@@ -95,7 +95,7 @@ export default function CartPage() {
                 <div key={item.id} className={styles.cartItem}>
                   <div className={styles.itemInfo}>
                     <div className={styles.imageContainer}>
-                       <Image src={item.image} alt={item.nombre} fill style={{ objectFit: 'contain', padding: '5px' }} />
+                       <Image src="/Imagines/arroz.jpeg" alt={item.nombre} fill style={{ objectFit: 'contain', padding: '5px' }} />
                     </div>
                     <div className={styles.itemDetails}>
                       <h3>{item.nombre}</h3>

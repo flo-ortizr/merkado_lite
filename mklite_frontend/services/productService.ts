@@ -1,12 +1,6 @@
 import api from "@/services/api";
+import { Product } from "@/app/models/Product";
 
-export interface Product {
-  id: number;
-  nombre: string;
-  precio: string;
-  description: string;
-  image?: string; // opcional, por defecto podemos mostrar un placeholder
-}
 
 export const fetchProducts = async (): Promise<Product[]> => {
   try {

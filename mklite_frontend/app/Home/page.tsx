@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image'; 
 import { useRouter } from 'next/navigation'; 
 import styles from './HomePage.module.css'; 
-
 // --- 1. Tipos ---
 type Product = {
   id: number;
@@ -21,7 +20,7 @@ type ProductCardProps = {
 };
 
 type ProductShelfProps = {
-  id: string; // <--- NUEVO: Necesitamos un ID para identificar la sección
+  id: string;
   title: string;
   products: Product[];
   forwardRef: React.RefObject<HTMLElement | null>; 
@@ -74,7 +73,7 @@ const ProductCard = ({ product, onCardClick, onAddToCart }: ProductCardProps) =>
     <div onClick={() => onCardClick(product)} className={styles.productCard}>
       <div className={styles.cardImage}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Image src={product.image} alt={product.nombre} fill style={{ objectFit: 'contain', padding: '10px' }} />
+          <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain', padding: '10px' }} />
         </div>
       </div>
       <div className={styles.cardContent}>
@@ -124,7 +123,7 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
         <div className={styles.modalContent}>
           <div className={styles.modalImage}>
              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-               <Image src={product.image} alt={product.nombre} fill style={{ objectFit: 'contain' }} />
+               <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain' }} />
              </div>
           </div>
           <div className={styles.modalInfo}>
@@ -170,7 +169,7 @@ export default function HomePage() {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  // --- MAGIA DEL SCROLL SPY (OBSERVADOR) ---
+  
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -201,10 +200,10 @@ export default function HomePage() {
   const handleScrollTo = (key: string) => {
     const ref = categoryRefs[key as keyof typeof categoryRefs];
     if (ref && ref.current) {
-      // Un pequeño ajuste (-140) para compensar el header fijo
+      
       const y = ref.current.getBoundingClientRect().top + window.pageYOffset - 140;
       window.scrollTo({ top: y, behavior: 'smooth' });
-      // setActiveCategory se actualizará solo gracias al observer
+     
     }
   };
 
@@ -318,7 +317,7 @@ export default function HomePage() {
           {categoriesList.map((cat) => (
               <ProductShelf 
                 key={cat.key}
-                id={cat.key} // PASAMOS EL ID AQUÍ
+                id={cat.key} 
                 title={cat.label} 
                 products={productData[cat.key] || []} 
                 forwardRef={categoryRefs[cat.key as keyof typeof categoryRefs]} 

@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { registerUser } from "./userService";
-import { User } from "./User";
+import { registerUser } from "../../services/userService";
+import { User } from "../models/User";
 import { Modal } from "@/components/Modal";
 import styles from "./RegisterPage.module.css";
 
