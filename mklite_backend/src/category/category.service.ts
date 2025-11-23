@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { Category } from 'src/category/category.entity';
+import { CreateCategoryDto } from './dto/create_category.dto';
+import { UpdateCategoryDto } from './dto/update_category.dto';
 
 @Injectable()
 export class CategoryService {
-    async createCategory(category: Category){
+    async createCategory(dto: CreateCategoryDto) {
+        const category = AppDataSource.manager.create(Category, dto);
         return await AppDataSource.manager.save(Category, category);
     }
 
@@ -20,7 +23,8 @@ export class CategoryService {
         return await AppDataSource.manager.delete(Category, {id_category: id});
     }
 
-    async UpdateCategory(id: number, category: Category) {
-        return await AppDataSource.manager.update(Category, {id_category: id}, category);
+    async UpdateCategory(id: number, dto: UpdateCategoryDto) {
+        await AppDataSource.manager.update(Category, {id_category: id}, dto);
+        return this.getCategoryById(id);
     }
 }

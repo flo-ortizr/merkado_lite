@@ -1,9 +1,9 @@
 // user.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { User } from './user.entity';
-import { Role } from '../role/role.entity';
 import * as bcrypt from 'bcrypt';
+import { Role } from 'src/role/role.entity';
 
 @Injectable()
 export class UserService {
@@ -28,10 +28,6 @@ export class UserService {
     return await AppDataSource.manager.save(User, user);
   }
 
-
-
-
-
   async getAllUsers() {
     return await AppDataSource.manager.find(User);
   }
@@ -42,10 +38,6 @@ export class UserService {
 
   async DeleteUser(id: number) {
     return await AppDataSource.manager.delete(User, { id_user: id });
-  }
-
-  async UpdateUser(id: number, userData: Partial<User>) {
-    return await AppDataSource.manager.update(User, { id_user: id }, userData);
   }
 
   async findByEmail(email: string) {
