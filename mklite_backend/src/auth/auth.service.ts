@@ -5,6 +5,8 @@ import { AppDataSource } from 'src/data-source';
 import { User } from '../user/user.entity';
 import { Role } from '../role/role.entity';
 import { Customer } from '../customer/customer.entity';
+import { RegisterClientDto } from './dto/register_client.dto';
+import { RegisterByAdminDto } from './dto/register_by_admin.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +38,7 @@ export class AuthService {
   }
 
   /** Registro normal — siempre Cliente */
-  async registerClient(data: any) {
+  async registerClient(data: RegisterClientDto) {
     const exists = await AppDataSource.manager.findOne(User, { where: { email: data.email } });
     if (exists) throw new BadRequestException('El email ya existe');
 
@@ -48,19 +50,19 @@ export class AuthService {
     const user = AppDataSource.manager.create(User, { ...data, password, role: clientRole });
     const savedUser = await AppDataSource.manager.save(User, user);
 
-    // crear Customer automáticamente
+    // Crear Customer automáticamente
     const customer = AppDataSource.manager.create(Customer, { user: savedUser });
     await AppDataSource.manager.save(Customer, customer);
 
     return savedUser;
   }
 
-  /** Registro especial — solo Admin puede crear roles como Vendedor, Repartidor, etc */
-  async registerByAdmin(data: any, roleName: string) {
+  /** Registro especial — solo Admin puede crear otros roles */
+  async registerByAdmin(data: RegisterByAdminDto) {
     const exists = await AppDataSource.manager.findOne(User, { where: { email: data.email } });
     if (exists) throw new BadRequestException('El email ya existe');
 
-    const role = await AppDataSource.manager.findOne(Role, { where: { name: roleName } });
+    const role = await AppDataSource.manager.findOne(Role, { where: { name: data.roleName } });
     if (!role) throw new BadRequestException('El rol no existe');
 
     const password = await bcrypt.hash(data.password, 10);
