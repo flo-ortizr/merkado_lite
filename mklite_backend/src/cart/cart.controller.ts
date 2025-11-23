@@ -8,8 +8,8 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get(':customerId')
-  async getCartItems(@Param('customerId') customerId: number) {
-    return this.cartService.getCartItems(customerId);  // Llama al método getCartItems
+  async getCart(@Param('customerId') customerId: number) {
+    return this.cartService.getCart(customerId);  // Llama al método getCartItems
   }
 
   @Post('add/:customerId')
