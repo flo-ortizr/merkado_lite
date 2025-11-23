@@ -59,7 +59,7 @@ export class PurchaseOrderService {
 
       if (!inventory) {
         throw new BadRequestException(
-          El producto ${product.name} no tiene inventario asignado
+          "El producto ${product.name} no tiene inventario asignado"
         );
       }
 
