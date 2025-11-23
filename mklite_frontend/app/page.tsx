@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { loginUser } from "../app/login/loginService";
-import styles from "../app/login/LoginPage.module.css";
+import { loginUser } from "./login/loginService"
+import LoginModel from "./login/login.model"
+import { User } from "./models/User"
+import styles from "./login/LoginPage.module.css"
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,8 +15,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    console.log("handleLogin ejecutado"); // log de depuración
     setError("");
 
     if (!email || !password) {
@@ -23,12 +25,36 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+
     try {
-      const response = await loginUser({ email, password });
+      const data: LoginModel = { email, password };
+      const response: { token: string; user: User } = await loginUser(data);
       localStorage.setItem("token", response.token);
-      router.push("/Home");
+      localStorage.setItem("role", response.user.role?.name || "Cliente");
+      const roleName = response.user.role?.name;
+      switch (roleName) {
+        case "Administrador":
+          router.push("/administrador/usuarios/lista");
+          break;
+        case "Vendedor":
+          router.push("/vendedor/ventas-presenciales");
+          break;
+        case "Encargado de Almacén":
+          router.push("/almacen/inventario");
+          break;
+        case "Repartidor":
+          router.push("/repartidor");
+          break;
+        case "Soporte":
+          router.push("/SoporteHome");
+          break;
+        default:
+          router.push("/Home");
+          break;
+      }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Credenciales incorrectas");
+      console.error("Error login:", err);
+      setError(err.message || "Credenciales incorrectas");
     } finally {
       setLoading(false);
     }
@@ -42,7 +68,13 @@ export default function LoginPage() {
             Login
           </h1>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          {/* Quitamos onSubmit para evitar recarga y problemas de submit */}
+          <form className="space-y-6" onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleLogin();
+            }
+          }}>
             <input
               type="email"
               placeholder="Correo electrónico"
@@ -57,14 +89,24 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
             />
+
             {error && <p className={styles.error}>{error}</p>}
-            <button type="submit" className={styles.button} disabled={loading}>
+
+            <button
+              type="button"
+              onClick={handleLogin}
+              className={styles.button}
+              disabled={loading}
+            >
               {loading ? "Iniciando..." : "Iniciar sesión"}
             </button>
           </form>
 
           <div className="text-center mt-4">
-            <a href="/Register" className="text-red-600 font-medium hover:text-red-800 transition">
+            <a
+              href="/Register"
+              className="text-red-600 font-medium hover:text-red-800 transition"
+            >
               Crear cuenta
             </a>
           </div>

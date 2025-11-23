@@ -10,13 +10,15 @@ import styles from "./RegisterPage.module.css";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState<User>({
-    name: "",
-    ci: "",
-    phone: "",
-    email: "",
-    password: "",
-  });
+  const [form, setForm] = useState<User & { code_user?: string }>({
+  name: "",
+  ci: "",
+  phone: "",
+  email: "",
+  password: "",
+  code_user: "", 
+});
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -26,24 +28,30 @@ export default function RegisterPage() {
   };
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!form.name || !form.ci || !form.phone || !form.email || !form.password) {
-      setError("Por favor completa todos los campos");
-      return;
-    }
+  if (!form.name || !form.ci || !form.phone || !form.email || !form.password) {
+    setError("Por favor completa todos los campos");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      await registerUser(form);
-      setShowModal(true);
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const userToRegister = {
+      ...form,
+      code_user: form.code_user?.trim() || "CLI", // si no pone nada, se envía CLI
+    };
+
+    await registerUser(userToRegister);
+    setShowModal(true);
+  } catch (err: any) {
+    setError(err.response?.data?.message || err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const closeModal = () => {
     setShowModal(false);
@@ -99,6 +107,9 @@ export default function RegisterPage() {
               onChange={handleChange}
               className={styles.input}
             />
+
+
+
 
             {error && <p className="text-red-600 text-sm text-center font-medium">{error}</p>}
 

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { loginUser } from "./loginService";
 import LoginModel from "./login.model";
+import { User } from "../models/User";
 import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
@@ -14,8 +15,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    console.log("handleLogin ejecutado"); // log de depuración
     setError("");
 
     if (!email || !password) {
@@ -24,13 +25,40 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+
     try {
       const data: LoginModel = { email, password };
-      const response = await loginUser(data);
+      const response: { token: string; user: User } = await loginUser(data);
+      console.log("Usuario recibido:", response.user);
 
+      // Guardar token y rol en localStorage
       localStorage.setItem("token", response.token);
-      router.push("/Home");
+      localStorage.setItem("role", response.user.role?.name || "Cliente");
+
+      // Redirigir según rol
+      const roleName = response.user.role?.name;
+      switch (roleName) {
+        case "Administrador":
+          router.push("/administrador/usuarios/lista");
+          break;
+        case "Vendedor":
+          router.push("/VendedorHome");
+          break;
+        case "Encargado de Almacén":
+          router.push("/AlmacenHome");
+          break;
+        case "Repartidor":
+          router.push("/RepartidorHome");
+          break;
+        case "Soporte":
+          router.push("/SoporteHome");
+          break;
+        default:
+          router.push("/administrador/usuarios/lista");
+          break;
+      }
     } catch (err: any) {
+      console.error("Error login:", err);
       setError(err.message || "Credenciales incorrectas");
     } finally {
       setLoading(false);
@@ -45,7 +73,13 @@ export default function LoginPage() {
             Login
           </h1>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          {/* Quitamos onSubmit para evitar recarga y problemas de submit */}
+          <form className="space-y-6" onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleLogin();
+            }
+          }}>
             <input
               type="email"
               placeholder="Correo electrónico"
@@ -55,7 +89,7 @@ export default function LoginPage() {
             />
             <input
               type="password"
-              placeholder="Contraseña"
+              placeholder="Contraseña2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={styles.input}
@@ -63,7 +97,12 @@ export default function LoginPage() {
 
             {error && <p className={styles.error}>{error}</p>}
 
-            <button type="submit" className={styles.button} disabled={loading}>
+            <button
+              type="button"
+              onClick={handleLogin}
+              className={styles.button}
+              disabled={loading}
+            >
               {loading ? "Iniciando..." : "Iniciar sesión"}
             </button>
           </form>
