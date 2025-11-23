@@ -7,23 +7,29 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  async createUser(userData: Partial<User>) {
-  if (!userData) throw new Error('No se recibió data del usuario');
+  async createUser(userData: Partial<User> & { roleId?: number }) {
+    if (!userData) throw new Error('No se recibió data del usuario');
 
-  const role = await AppDataSource.manager.findOneBy(Role, { id_role: 1 });
-  if (!role) throw new Error('Role no encontrado');
+    // Usar roleId enviado en el body
+    const roleId = userData.roleId || 1; // si no envían nada, asignar Cliente por defecto
+    const role = await AppDataSource.manager.findOneBy(Role, { id_role: roleId });
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(userData.password, salt);
+    if (!role) throw new Error('Role no encontrado');
 
-  const user = AppDataSource.manager.create(User, {
-    ...userData,
-    password: hashedPassword,
-    role,
-  });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
 
-  return await AppDataSource.manager.save(User, user);
-}
+    const user = AppDataSource.manager.create(User, {
+      ...userData,
+      password: hashedPassword,
+      role, 
+    });
+
+    return await AppDataSource.manager.save(User, user);
+  }
+
+
+
 
 
   async getAllUsers() {
@@ -47,12 +53,21 @@ export class UserService {
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.findByEmail(email);
-    if (!user) return null;
+  // Traer el usuario incluyendo la relación 'role'
+  const user = await AppDataSource.manager.findOne(User, {
+    where: { email },
+    relations: ["role"], // <- esto es lo importante
+  });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return null;
+  if (!user) return null;
 
-    return user;
-  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return null;
+
+  return user; // ahora user.role estará disponible
+}
+
+
+  
+
 }
