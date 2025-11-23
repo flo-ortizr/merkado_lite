@@ -51,15 +51,15 @@ export class UserService {
   }
 
   async getAllUsers() {
-    return await AppDataSource.manager.find(User);
+    return AppDataSource.manager.find(User);
   }
 
   async getUserById(id: number) {
-    return await AppDataSource.manager.findOneBy(User, { id_user: id });
+    return AppDataSource.manager.findOneBy(User, { id_user: id });
   }
 
   async DeleteUser(id: number) {
-    return await AppDataSource.manager.delete(User, { id_user: id });
+    return AppDataSource.manager.delete(User, { id_user: id });
   }
 
   async findByEmail(email: string) {
