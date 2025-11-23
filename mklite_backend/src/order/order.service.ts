@@ -6,6 +6,8 @@ import { Order } from './order.entity';
 import { OrderDetail } from 'src/order_detail/order_detail.entity';
 import { ConfirmOrderDto } from './dto/confirm_order.dto';
 import { Delivery } from 'src/delivery/delivery.entity';
+import { Customer } from 'src/customer/customer.entity';
+import { OrderHistoryDto } from './dto/order_history.dto';
 
 @Injectable()
 export class OrderService {
@@ -74,4 +76,31 @@ export class OrderService {
       delivery,
     };
   }
+
+  async getOrderHistory(customerId: number): Promise<OrderHistoryDto[]> {
+  const customer = await AppDataSource.manager.findOne(Customer, {
+    where: { id_customer: customerId },
+  });
+
+  if (!customer) throw new BadRequestException('Cliente no encontrado');
+
+  const orders = await AppDataSource.manager.find(Order, {
+    where: { customer: { id_customer: customerId } },
+    relations: ['details', 'details.product'], 
+    order: { order_date: 'DESC' },
+  });
+
+  if (!orders || orders.length === 0) return [];
+
+  // mapear al DTO resumido
+  return orders.map(order => ({
+    id_order: order.id_order,
+    order_date: order.order_date,
+    status: order.status,
+    total: Number(order.total),
+    details: order.details.map(d => ({
+      product_name: d.product.name, 
+    })),
+  }));
+}
 }
