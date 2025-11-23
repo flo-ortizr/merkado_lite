@@ -1,6 +1,8 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RegisterClientDto } from './dto/register_client.dto';
+import { RegisterByAdminDto } from './dto/register_by_admin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +16,30 @@ export class AuthController {
       throw new HttpException(
         error.message || 'Error al iniciar sesión',
         HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  @Post('register')
+  async registerClient(@Body() body: RegisterClientDto) {
+    try {
+      return await this.authService.registerClient(body);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Error al registrar cliente',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post('register/admin')
+  async registerByAdmin(@Body() body: RegisterByAdminDto) {
+    try {
+      return await this.authService.registerByAdmin(body);
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Error al registrar usuario por admin',
+        HttpStatus.BAD_REQUEST,
       );
     }
   }
