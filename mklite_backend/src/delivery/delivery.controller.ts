@@ -1,18 +1,24 @@
-import { Controller, Post, Param, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { DeliveryService } from './delivery.service';
+import { AssignDeliveryDto } from './dto/assign_delivery.dto';
+import { UpdateDeliveryStatusDto } from './dto/update_delivery_status.dto';
 
-@Controller ('/delivery')
+@Controller('/delivery')
 export class DeliveryController {
-    
-    constructor(private readonly deliveryService: DeliveryService) {}
-    
-    @Post('/deliver/:orderId')
-    deliverOrder(@Param('orderId') orderId: number) {
-        return this.deliveryService.deliverOrder(orderId);
-    }
+  constructor(private readonly deliveryService: DeliveryService) {}
 
-    @Post('/schedule/:orderId')
-    scheduleDelivery(@Param('orderId') orderId: number, @Body('scheduledDate') scheduledDate: Date) {
-        return this.deliveryService.scheduleDelivery(orderId, scheduledDate);
-    }
+  @Post('/assign')
+  async assign(@Body() dto: AssignDeliveryDto) {
+    return this.deliveryService.assignDelivery(dto);
+  }
+
+  @Post('/update-status')
+  async updateStatus(@Body() dto: UpdateDeliveryStatusDto) {
+    return this.deliveryService.updateStatus(dto);
+  }
+
+  @Get('/driver/:id')
+  async driverHistory(@Param('id') driverId: number) {
+    return this.deliveryService.getDeliveriesByDriver(driverId);
+  }
 }
