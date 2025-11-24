@@ -100,7 +100,7 @@ export class DeliveryService {
   const orderTotal = Number(order.total);
 
   // REGLA: hasta 1 día para pedidos regulares
-  if (orderTotal < 300) {
+  if (orderTotal < 500) {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 1);
 
@@ -110,7 +110,7 @@ export class DeliveryService {
       );
   }
 
-  // REGLA: hasta 7 días si el total >= 300
+  // REGLA: hasta 7 días si el total >= 500
   else {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 7);
