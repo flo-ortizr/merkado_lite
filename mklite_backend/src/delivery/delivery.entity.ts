@@ -15,7 +15,7 @@ export class Delivery {
   @JoinColumn({ name: 'id_driver' })
   driver: User;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'datetime', nullable: true })
   scheduled_date: Date;
 
   @Column({ type: 'datetime', nullable: true })
