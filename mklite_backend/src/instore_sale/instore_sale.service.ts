@@ -6,11 +6,15 @@ import { CreateInStoreSaleDto } from './dto/create_instore_sale.dto';
 import { Product } from 'src/product/product.entity';
 import { Inventory } from 'src/inventory/inventory.entity';
 import { User } from 'src/user/user.entity';
+import { InventoryService } from 'src/inventory/inventory.service';
 import { CancelSaleDto } from './dto/cancel_sale.dto';
 import { ReturnItemDto } from './dto/return_item.dto';
 
 @Injectable()
 export class InStoreSaleService {
+
+  constructor(
+  private readonly inventoryService: InventoryService,) {}
 
   async createSale(dto: CreateInStoreSaleDto) {
     // 1. validar vendedor
@@ -39,8 +43,7 @@ export class InStoreSaleService {
       if (inventory.quantity < item.quantity) throw new BadRequestException(`Stock insuficiente para ${product.name}`);
 
       // descontar stock
-      inventory.quantity -= item.quantity;
-      await AppDataSource.manager.save(Inventory, inventory);
+      await this.inventoryService.updateStock({ productId: item.productId, quantity: -item.quantity });
 
       // crear detalle de venta
       const subtotal = Number(item.quantity) * Number(product.price);
@@ -62,7 +65,7 @@ export class InStoreSaleService {
     return savedSale;
   }
 
-  // opcional: listar ventas de un vendedor
+  // listar ventas de un vendedor
   async getSalesByUser(userId: number) {
     const sales = await AppDataSource.manager.find(InStoreSale, {
       where: { user: { id_user: userId } },
@@ -73,70 +76,62 @@ export class InStoreSaleService {
   }
 
   async cancelSale(dto: CancelSaleDto) {
-    const sale = await AppDataSource.manager.findOne(InStoreSale, {
-    where: { id_sale: dto.saleId },
-    relations: ['details', 'details.product']
-  });
-  if (!sale) throw new BadRequestException('Venta no encontrada');
-  if (sale.status === 'cancelled') throw new BadRequestException('La venta ya está anulada');
 
-  // restaurar inventario
-  for (const item of sale.details) {
-    const inventory = await AppDataSource.manager.findOne(Inventory, {
-      where: { product: { id_product: item.product.id_product } }
+    const sale = await AppDataSource.manager.findOne(InStoreSale, {
+      where: { id_sale: dto.saleId },
+      relations: ['details', 'details.product']
     });
 
-    if (!inventory)
-      throw new BadRequestException(`No existe inventario para ${item.product.name}`);
+    if (!sale) throw new BadRequestException('Venta no encontrada');
+    if (sale.status === 'cancelled') throw new BadRequestException('La venta ya está anulada');
 
-    inventory.quantity += item.quantity;
-    await AppDataSource.manager.save(Inventory, inventory);
+    // restaurar inventario de cada producto
+    for (const item of sale.details) {
+      await this.inventoryService.updateStock({
+        productId: item.product.id_product,
+        quantity: item.quantity // los devuelve
+      });
+    }
+
+    sale.status = 'cancelled';
+    sale.cancel_reason = dto.reason;
+
+    await AppDataSource.manager.save(InStoreSale, sale);
+
+    return { message: 'Venta anulada y stock restaurado', sale };
   }
 
-  // marcar venta como anulada
-  sale.status = 'cancelled';
-  sale.cancel_reason = dto.reason;
+  async returnItem(dto: ReturnItemDto) {
 
-  await AppDataSource.manager.save(InStoreSale, sale);
+    const sale = await AppDataSource.manager.findOne(InStoreSale, {
+      where: { id_sale: dto.saleId },
+      relations: ['details', 'details.product']
+    });
 
-  return { message: "Venta anulada y stock restaurado", sale };
-}
+    if (!sale) throw new BadRequestException('Venta no encontrada');
+    if (sale.status === 'cancelled') throw new BadRequestException('La venta está anulada');
 
-async returnItem(dto: ReturnItemDto) {
+    const detail = sale.details.find(d => d.product.id_product === dto.productId);
+    if (!detail) throw new BadRequestException('El producto no pertenece a esta venta');
 
-  const sale = await AppDataSource.manager.findOne(InStoreSale, {
-    where: { id_sale: dto.saleId },
-    relations: ['details', 'details.product']
-  });
+    if (dto.quantity > detail.quantity)
+      throw new BadRequestException('Cantidad mayor a la comprada');
 
-  if (!sale) throw new BadRequestException('Venta no encontrada');
-  if (sale.status === 'cancelled') throw new BadRequestException('La venta está anulada');
+    // devolver stock
+    await this.inventoryService.updateStock({
+      productId: dto.productId,
+      quantity: dto.quantity
+    });
 
-  const detail = sale.details.find(d => d.product.id_product === dto.productId);
-  if (!detail) throw new BadRequestException('El producto no pertenece a esta venta');
+    // actualizar detalle
+    detail.quantity -= dto.quantity;
+    detail.subtotal = detail.quantity * Number(detail.product.price);
+    await AppDataSource.manager.save(InStoreSaleDetail, detail);
 
-  if (dto.quantity > detail.quantity)
-    throw new BadRequestException('Cantidad mayor a la comprada');
+    // recalcular total
+    sale.total = sale.details.reduce((acc, d) => acc + d.subtotal, 0);
+    await AppDataSource.manager.save(InStoreSale, sale);
 
-  // sumar stock
-  const inventory = await AppDataSource.manager.findOne(Inventory, {
-    where: { product: { id_product: dto.productId } }
-  });
-
-  if (!inventory) throw new BadRequestException('Inventario no encontrado');
-
-  inventory.quantity += dto.quantity;
-  await AppDataSource.manager.save(Inventory, inventory);
-
-  // opcional: registrar historial de devoluciones
-  detail.quantity -= dto.quantity;
-  detail.subtotal = detail.quantity * Number(detail.product.price);
-  await AppDataSource.manager.save(InStoreSaleDetail, detail);
-
-  // recalcular total
-  sale.total = sale.details.reduce((acc, d) => acc + d.subtotal, 0);
-  await AppDataSource.manager.save(InStoreSale, sale);
-
-  return { message: "Devolución procesada", sale };
-}
+    return { message: 'Devolución procesada', sale };
+  }
 }
