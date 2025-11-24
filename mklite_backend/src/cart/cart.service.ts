@@ -80,17 +80,44 @@ export class CartService {
 
   // EDITAR CANTIDAD DE ITEM
   async updateCartItem(customerId: number, itemId: number, dto: UpdateCartItemDto) {
-    const cart = await this.getCart(customerId);
+  const cart = await this.getCart(customerId);
 
-    const item = cart.items.find(i => i.id_cart_item === itemId);
-    if (!item) throw new Error('Item no encontrado');
+  const item = cart.items.find(i => i.id_cart_item === itemId);
+  if (!item) throw new Error('Item no encontrado');
 
-    item.quantity = dto.quantity;
+  // Inventario del producto
+  const inventory = await AppDataSource.manager.findOne(Inventory, {
+    where: { product: { id_product: item.product.id_product } }
+  });
 
-    await AppDataSource.manager.save(CartItem, item);
+  if (!inventory) throw new Error('Inventario no encontrado');
 
-    return this.getCart(customerId);
+  const cantidadAnterior = item.quantity;
+  const cantidadNueva = dto.quantity;
+  const diferencia = cantidadNueva - cantidadAnterior;
+
+  // Si necesita más cantidad
+  if (diferencia > 0) {
+    if (inventory.quantity < diferencia) {
+      throw new Error('Stock insuficiente');
+    }
+    inventory.quantity -= diferencia;
   }
+
+  // Si reduce cantidad → devolver al inventario
+  if (diferencia < 0) {
+    inventory.quantity += Math.abs(diferencia);
+  }
+
+  // Guardar inventario actualizado
+  await AppDataSource.manager.save(Inventory, inventory);
+
+  // actualizar item
+  item.quantity = cantidadNueva;
+  await AppDataSource.manager.save(CartItem, item);
+
+  return this.getCart(customerId);
+}
 
   // ELIMINAR ITEM DEL CARRITO
   async removeCartItem(customerId: number, itemId: number) {
