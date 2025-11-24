@@ -121,13 +121,24 @@ export class CartService {
 
   // ELIMINAR ITEM DEL CARRITO
   async removeCartItem(customerId: number, itemId: number) {
-    const cart = await this.getCart(customerId);
+  const cart = await this.getCart(customerId);
 
-    const item = cart.items.find(i => i.id_cart_item === itemId);
-    if (!item) throw new Error('Item no encontrado');
+  const item = cart.items.find(i => i.id_cart_item === itemId);
+  if (!item) throw new Error('Item no encontrado');
 
-    await AppDataSource.manager.remove(CartItem, item);
+  const inventory = await AppDataSource.manager.findOne(Inventory, {
+    where: { product: { id_product: item.product.id_product } }
+  });
 
-    return this.getCart(customerId);
-  }
+  if (!inventory) throw new Error('Inventario no encontrado');
+
+  // Devolver toda la cantidad al inventario
+  inventory.quantity += item.quantity;
+  await AppDataSource.manager.save(Inventory, inventory);
+
+  // eliminar item
+  await AppDataSource.manager.remove(CartItem, item);
+
+  return this.getCart(customerId);
+}
 }
