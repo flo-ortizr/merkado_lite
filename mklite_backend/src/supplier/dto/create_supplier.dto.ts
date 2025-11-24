@@ -1,15 +1,26 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class CreateSupplierDto {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
+  address: string;
+
+  @IsString()
+  @IsNotEmpty()
+  manager_name: string;
+
+  @IsString()
+  @IsNotEmpty()
   phone: string;
 
-  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
   @IsString()
-  address: string;
+  @IsNotEmpty()
+  category: string;
 }

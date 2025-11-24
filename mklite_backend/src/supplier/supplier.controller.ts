@@ -1,34 +1,49 @@
-import { Controller, Delete, Get, Post, Param, Body, Put } from "@nestjs/common";
-import { CreateSupplierDto } from "./dto/create_supplier.dto";
-import { UpdateSupplierDto } from "./dto/update_supplier.dto";
-import { SupplierService } from "./supplier.service";
+import { Controller, Post, Get, Put, Delete, Param, Body, Query } from '@nestjs/common';
+import { SupplierService } from './supplier.service';
+import { CreateSupplierDto } from './dto/create_supplier.dto';
+import { UpdateSupplierDto } from './dto/update_supplier.dto';
 
 @Controller('/supplier')
 export class SupplierController {
-    constructor(private readonly supplierServie: SupplierService) {}
+  constructor(private readonly supplierService: SupplierService) {}
 
-    @Post()
-    createSupplier(@Body() dto: CreateSupplierDto) {
-        this.supplierServie.createSupplier(dto);
-    }
+  @Post()
+  create(@Body() dto: CreateSupplierDto) {
+    return this.supplierService.create(dto);
+  }
 
-    @Get()
-    getAllSuppliers() {
-        return this.supplierServie.getAllSuppliers();
-    }
+  @Get()
+  findAll() {
+    return this.supplierService.findAll();
+  }
 
-    @Get('/:id')
-    getSupplierById(@Param() params: any) {
-        return this.supplierServie.getSupplierById(params.id);
-    }
+  @Get('/:id')
+  findOne(@Param('id') id: number) {
+    return this.supplierService.findOne(id);
+  }
 
-    @Put('/:id')
-    updateSupplier(@Param('id') id: number, @Body() dto: UpdateSupplierDto) {
-        return this.supplierServie.updateSupplier(id, dto);
-    }
+  @Get('/search/name')
+  findByName(@Query('name') name: string) {
+    return this.supplierService.findByName(name);
+  }
 
-    @Delete('/:id')
-    deleteSupplier(@Param() params: any) {
-        return this.supplierServie.deleteSupplier(params.id);
-    }
+  @Get('/search/email')
+  findByEmail(@Query('email') email: string) {
+    return this.supplierService.findByEmail(email);
+  }
+
+  @Get('/search/category')
+  findByCategory(@Query('category') category: string) {
+    return this.supplierService.findByCategory(category);
+  }
+
+  @Put('/:id')
+  update(@Param('id') id: number, @Body() dto: UpdateSupplierDto) {
+    return this.supplierService.update(id, dto);
+  }
+
+  @Delete('/:id')
+  remove(@Param('id') id: number) {
+    return this.supplierService.remove(id);
+  }
 }
