@@ -3,9 +3,15 @@ import { AppDataSource } from 'src/data-source';
 import { Inventory } from './inventory.entity';
 import { Product } from '../product/product.entity';
 import { UpdateInventoryDto } from './dto/update_inventory.dto';
+import { NotificationService } from '../notification/notification.service';
+import { User } from 'src/user/user.entity';
 
 @Injectable()
 export class InventoryService {
+
+    constructor(
+        private readonly notificationService: NotificationService,
+    ) {}
 
   // obtener inventario completo
   async getAllInventory() {
@@ -31,6 +37,18 @@ export class InventoryService {
 
     await AppDataSource.manager.save(Inventory, inventory);
 
+    if (inventory.quantity <= inventory.min_stock) {
+      const users = await AppDataSource.manager.find(User, {
+        where: { role: { name: 'Encargado de Almacen' } }, 
+        relations: ['role']
+      });
+
+      for (const user of users) {
+        const msg = `El producto ${inventory.product.name} tiene stock bajo. Cantidad: ${inventory.quantity}, mínimo: ${inventory.min_stock}`;
+        await this.notificationService.sendNotification(msg, user.id_user);
+      }
+    }
+
     return { message: 'Inventario actualizado', inventory };
   }
 
@@ -43,4 +61,18 @@ export class InventoryService {
     if (!inventory) throw new BadRequestException('Inventario no encontrado');
     return inventory;
   }
+
+  async getInventoryStatus() {
+        return { status: "Inventory service is running" };
+    }
+
+    async getLowStockItems() {
+        return AppDataSource.manager
+    .getRepository(Inventory)
+    .createQueryBuilder("inv")
+    .leftJoinAndSelect("inv.product", "product")
+    .where("inv.quantity <= inv.min_stock")
+    .getMany();
+    }
+
 }
