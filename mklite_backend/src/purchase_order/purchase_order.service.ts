@@ -1,80 +1,69 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { PurchaseOrder } from './purchase_order.entity';
-import { OrderDetail } from '../order_detail/order_detail.entity';
-import { Inventory } from '../inventory/inventory.entity';
+import { Supplier } from '../supplier/supplier.entity';
+import { CreatePurchaseOrderDto } from './dto/create_purchase_order.dto';
+import { Product } from '../product/product.entity';
+import { PurchaseOrderItem } from '../purchase_order_item/purchase_order_item.entity';
 
 @Injectable()
 export class PurchaseOrderService {
-  async createPurchaseOrder(purchaseorder: PurchaseOrder) {
-    return AppDataSource.manager.save(PurchaseOrder, purchaseorder);
-  }
 
-  async getAllPurchaseOrders() {
-    return AppDataSource.manager.find(PurchaseOrder);
-  }
+  async createOrder(dto: CreatePurchaseOrderDto) {
+    // Validar proveedor
+    const supplier = await AppDataSource.manager.findOne(Supplier, {
+      where: { id_supplier: dto.supplierId }
+    });
+    if (!supplier) throw new BadRequestException('Proveedor no encontrado');
 
-  async getPurchaseOrderById(id: number) {
-    return AppDataSource.manager.findOneBy(PurchaseOrder, { id_purchase_order: id });
-  }
-
-  async DeletePurchaseOrder(id: number) {
-    return AppDataSource.manager.delete(PurchaseOrder, { id_purchase_order: id });
-  }
-
-  async UpdatePurchaseOrder(id: number, purchaseorder: PurchaseOrder) {
-    return AppDataSource.manager.update(PurchaseOrder, { id_purchase_order: id }, purchaseorder);
-  }
-
-  // ⭐ NUEVA FUNCIÓN: Confirmar compra
-  async confirmPurchase(id: number) {
-    // 1. Buscar la orden
-    const order = await AppDataSource.manager.findOne(PurchaseOrder, {
-      where: { id_purchase_order: id },
-      relations: ['supplier'], // por si se necesita luego
+    // Crear orden de compra
+    const order = AppDataSource.manager.create(PurchaseOrder, {
+      supplier,
+      order_date: new Date(),
+      total: dto.total,
+      status: 'pending',
+       items: []
     });
 
-    if (!order) {
-      throw new NotFoundException('Orden de compra no encontrada');
+    // Guardar productos en tabla detalle
+    for (const p of dto.products) {
+      const product = await AppDataSource.manager.findOne(Product, {
+        where: { id_product: p.productId }
+      });
+      if (!product) throw new BadRequestException(`Producto ${p.productId} no encontrado`);
+
+      const item = AppDataSource.manager.create(PurchaseOrderItem, {
+        purchaseOrder: order,
+        product,
+        quantity: p.quantity,
+        unit_price: p.unit_price
+      });
+
+      order.items.push(item);
     }
 
-    if (order.status === 'received') {
-      throw new BadRequestException('La orden ya fue confirmada anteriormente');
-    }
 
-    // 2. Buscar detalles vinculados a esta orden
-    const details = await AppDataSource.manager.find(OrderDetail, {
-      where: { order: { id_order: id } },
-      relations: ['product', 'product.inventory'],
-    });
-
-    if (details.length === 0) {
-      throw new BadRequestException('La orden no tiene detalles');
-    }
-
-    // 3. Actualizar inventario
-    for (const item of details) {
-      const product = item.product;
-      const inventory = product.inventory;
-
-      if (!inventory) {
-        throw new BadRequestException(
-          "El producto ${product.name} no tiene inventario asignado"
-        );
-      }
-
-      inventory.quantity = Number(inventory.quantity) + Number(item.quantity);
-
-      await AppDataSource.manager.save(Inventory, inventory);
-    }
-
-    // 4. Cambiar estado de la orden
-    order.status = 'received';
-    await AppDataSource.manager.save(PurchaseOrder, order);
+    const savedOrder = await AppDataSource.manager.save(PurchaseOrder, order);
 
     return {
-      message: 'Orden confirmada y stock actualizado correctamente',
-      order,
+      message: 'Orden de compra creada correctamente (PDF simulado)',
+      order: savedOrder
     };
+  }
+
+  async getOrders() {
+    return AppDataSource.manager.find(PurchaseOrder, {
+      relations: ['supplier', 'items', 'items.product'],
+      order: { order_date: 'DESC' }
+    });
+  }
+
+  async getOrderById(orderId: number) {
+    const order = await AppDataSource.manager.findOne(PurchaseOrder, {
+      where: { id_purchase_order: orderId },
+      relations: ['supplier', 'items', 'items.product']
+    });
+    if (!order) throw new BadRequestException('Orden no encontrada');
+    return order;
   }
 }
