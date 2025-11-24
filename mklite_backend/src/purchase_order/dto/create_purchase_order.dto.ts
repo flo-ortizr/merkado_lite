@@ -6,7 +6,7 @@ export class CreatePurchaseOrderDto {
 
   @IsArray()
   @IsNotEmpty({ each: true })
-  products: { productId: number; quantity: number }[];
+  products: { productId: number; quantity: number; unit_price: number }[];
 
   @Min(0)
   total: number;
