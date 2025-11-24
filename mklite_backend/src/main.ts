@@ -25,4 +25,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-//push rama HU14 reportes
