@@ -1,80 +1,52 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { PurchaseOrder } from './purchase_order.entity';
-import { OrderDetail } from '../order_detail/order_detail.entity';
-import { Inventory } from '../inventory/inventory.entity';
+import { Supplier } from '../supplier/supplier.entity';
+import { CreatePurchaseOrderDto } from './dto/create_purchase_order.dto';
+import { Product } from '../product/product.entity';
 
 @Injectable()
 export class PurchaseOrderService {
-  async createPurchaseOrder(purchaseorder: PurchaseOrder) {
-    return AppDataSource.manager.save(PurchaseOrder, purchaseorder);
-  }
 
-  async getAllPurchaseOrders() {
-    return AppDataSource.manager.find(PurchaseOrder);
-  }
+  async createOrder(dto: CreatePurchaseOrderDto) {
+    // Validar proveedor
+    const supplier = await AppDataSource.manager.findOne(Supplier, {
+      where: { id_supplier: dto.supplierId }
+    });
+    if (!supplier) throw new BadRequestException('Proveedor no encontrado');
 
-  async getPurchaseOrderById(id: number) {
-    return AppDataSource.manager.findOneBy(PurchaseOrder, { id_purchase_order: id });
-  }
-
-  async DeletePurchaseOrder(id: number) {
-    return AppDataSource.manager.delete(PurchaseOrder, { id_purchase_order: id });
-  }
-
-  async UpdatePurchaseOrder(id: number, purchaseorder: PurchaseOrder) {
-    return AppDataSource.manager.update(PurchaseOrder, { id_purchase_order: id }, purchaseorder);
-  }
-
-  // ⭐ NUEVA FUNCIÓN: Confirmar compra
-  async confirmPurchase(id: number) {
-    // 1. Buscar la orden
-    const order = await AppDataSource.manager.findOne(PurchaseOrder, {
-      where: { id_purchase_order: id },
-      relations: ['supplier'], // por si se necesita luego
+    // Crear orden de compra
+    const order = AppDataSource.manager.create(PurchaseOrder, {
+      supplier,
+      order_date: new Date(),
+      total: dto.total,
+      status: 'pending'
     });
 
-    if (!order) {
-      throw new NotFoundException('Orden de compra no encontrada');
-    }
+    const savedOrder = await AppDataSource.manager.save(PurchaseOrder, order);
 
-    if (order.status === 'received') {
-      throw new BadRequestException('La orden ya fue confirmada anteriormente');
-    }
-
-    // 2. Buscar detalles vinculados a esta orden
-    const details = await AppDataSource.manager.find(OrderDetail, {
-      where: { order: { id_order: id } },
-      relations: ['product', 'product.inventory'],
-    });
-
-    if (details.length === 0) {
-      throw new BadRequestException('La orden no tiene detalles');
-    }
-
-    // 3. Actualizar inventario
-    for (const item of details) {
-      const product = item.product;
-      const inventory = product.inventory;
-
-      if (!inventory) {
-        throw new BadRequestException(
-          "El producto ${product.name} no tiene inventario asignado"
-        );
-      }
-
-      inventory.quantity = Number(inventory.quantity) + Number(item.quantity);
-
-      await AppDataSource.manager.save(Inventory, inventory);
-    }
-
-    // 4. Cambiar estado de la orden
-    order.status = 'received';
-    await AppDataSource.manager.save(PurchaseOrder, order);
-
+    // Aquí podemos guardar los productos de la orden en otra tabla
+    // Por ahora, solo devuelve la info de la orden y los productos solicitados
     return {
-      message: 'Orden confirmada y stock actualizado correctamente',
-      order,
+      message: 'Orden de compra creada correctamente (PDF simulado)',
+      order: savedOrder,
+      productsRequested: dto.products
     };
+  }
+
+  async getOrders() {
+    return AppDataSource.manager.find(PurchaseOrder, {
+      relations: ['supplier'],
+      order: { order_date: 'DESC' }
+    });
+  }
+
+  async getOrderById(orderId: number) {
+    const order = await AppDataSource.manager.findOne(PurchaseOrder, {
+      where: { id_purchase_order: orderId },
+      relations: ['supplier']
+    });
+    if (!order) throw new BadRequestException('Orden no encontrada');
+    return order;
   }
 }
