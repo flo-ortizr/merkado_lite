@@ -7,13 +7,22 @@ export class Supplier {
   id_supplier: number;
 
   @Column()
-  name: string;
+  name: string; // nombre de la empresa
+
+  @Column()
+  address: string;
+
+  @Column()
+  manager_name: string; // gerente de ventas
 
   @Column()
   phone: string;
 
   @Column()
-  address: string;
+  email: string;
+
+  @Column()
+  category: string;
 
   @OneToMany(() => Product, (product) => product.supplier)
   products: Product[];
