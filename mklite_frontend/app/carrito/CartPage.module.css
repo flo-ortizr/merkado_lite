@@ -1,5 +1,8 @@
 /* app/carrito/CartPage.module.css */
 
+/* Importamos la fuente "Fredoka" (Igual que en Home) */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Helvetica+Neue:wght@400;700&display=swap');
+
 .container {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   background-color: #f4f4f4;
@@ -23,12 +26,15 @@
   padding: 0 20px;
 }
 
+/* --- LOGO ACTUALIZADO (Estilo Merkado Lite) --- */
 .logo {
-  font-weight: 900;
-  font-size: 24px;
+  font-family: 'Fredoka', sans-serif; /* Fuente redonda */
+  font-weight: 700;
+  font-size: 28px; /* Un poco más grande para destacar */
   color: #fff;
   cursor: pointer;
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.15);
 }
 
 /* --- Contenido Principal --- */

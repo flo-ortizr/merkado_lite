@@ -233,7 +233,7 @@ export default function CompraPage() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.headerContent} onClick={() => router.push('/Home')}>
-          MERCADO LITE
+          MERKADO LITE
         </div>
       </header>
 
