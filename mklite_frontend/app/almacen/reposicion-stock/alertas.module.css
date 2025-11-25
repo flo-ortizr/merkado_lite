@@ -1,0 +1,136 @@
+/* frontend/app/almacen/reposicion-stock/alertas.module.css */
+
+.container {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.contadorAlertas {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin-bottom: 8px;
+}
+
+.emptySubtext {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Tarjetas de alerta */
+.alertaList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alertaCard {
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.alertaCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.alertaCardAlta {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.alertaCardMedia {
+  background-color: #fffbeb;
+  border-color: #fed7aa;
+  color: #d97706;
+}
+
+.alertaCardBaja {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+
+.alertaContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alertaInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alertaIcon {
+  font-size: 1.5rem;
+}
+
+.alertaDetails h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+}
+
+.alertaDetails p {
+  font-size: 0.875rem;
+  margin: 2px 0;
+  color: inherit;
+  opacity: 0.9;
+}
+
+.btnPedirStock {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnPedirStock:hover {
+  background-color: #b91c1c;
+  transform: scale(1.05);
+}
