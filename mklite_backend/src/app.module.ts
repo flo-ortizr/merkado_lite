@@ -17,14 +17,13 @@ import { DeliveryModule } from './delivery/delivery.module';
 import { CustomerModule } from './customer/customer.module';
 import { CategoryModule } from './category/category.module';
 import { AuditLogModule } from './audit_log/audit_log.module';
-import { ReturnModule } from './return/return.module';
 import { CartModule } from './cart/cart.module';
 import { CartItemModule } from './cart_item/cart_item.module';
 import { AuthModule } from './auth/auth.module';
 import { SupplierModule } from './supplier/supplier.module';
 
 @Module({
-  imports: [UserModule, RoleModule, ReturnModule, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
+  imports: [UserModule, RoleModule, PromotionModule, ProductModule, PriceHistoryModule, OrderModule, OrderDetailModule, NotificationModule,
     InventoryModule, InstoreSaleModule, InstoreSaleDetailModule, DeliveryModule, CustomerModule, CategoryModule, AuditLogModule, CartModule, CartItemModule,  AuthModule, SupplierModule],
   controllers: [AppController],
   providers: [AppService],
