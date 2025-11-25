@@ -14,4 +14,10 @@ export class OrderController {
   ) {
     return this.orderService.confirmOrder(customerId, dto);
   }
+
+  @Post('/cancel-expired')
+cancelExpiredOrders() {
+  return this.orderService.cancelExpiredOrders();
+}
+
 }

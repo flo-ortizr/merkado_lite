@@ -103,4 +103,57 @@ export class OrderService {
     })),
   }));
 }
+
+// src/order/order.service.ts
+
+async cancelExpiredOrders() {
+  const now = new Date();
+  const ONE_HOUR = 60 * 60 * 1000;
+
+  // 1. Buscar pedidos pendientes
+  const pendingOrders = await AppDataSource.manager.find(Order, {
+    where: { status: 'pending' },
+    relations: ['details', 'details.product', 'details.product.inventory'],
+  });
+
+  if (!pendingOrders || pendingOrders.length === 0) {
+    return { message: 'No hay pedidos pendientes' };
+  }
+
+  let cancelled = 0;
+
+  for (const order of pendingOrders) {
+    const orderTime = new Date(order.order_date).getTime();
+    const diff = now.getTime() - orderTime;
+
+    // 2. verificar si pasaron más de 1 hora
+    if (diff >= ONE_HOUR) {
+      // 3. Restaurar stock por cada detalle
+      for (const detail of order.details) {
+        const inv = detail.product.inventory;
+        if (inv) {
+          inv.quantity += detail.quantity;
+          await AppDataSource.manager.save(inv);
+        }
+      }
+
+      // 4. Cambiar estado a cancelado
+      order.status = 'cancelled';
+      await AppDataSource.manager.save(order);
+
+      // 5. Registrar historial si deseas
+      // (Solo si tienes una tabla. Si no, lo dejamos comentado)
+      // await this.registerHistory(order.id_order, 'cancelled');
+
+      cancelled++;
+    }
+  }
+
+  return {
+    message: `Proceso finalizado`,
+    cancelled,
+  };
+}
+
+
 }
