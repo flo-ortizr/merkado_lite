@@ -11,7 +11,7 @@ import { Customer } from "src/customer/customer.entity";
 @Injectable()
 export class CartService {
 
-  // Obtener o crear carrito activo
+  // ==================== OBTENER/CREAR CARRITO ====================
   async getCart(customerId: number) {
     let cart = await AppDataSource.manager.findOne(Cart, {
       where: { customer: { id_customer: customerId }, status: 'active' },
@@ -34,7 +34,8 @@ export class CartService {
     return cart;
   }
 
-  // AGREGAR PRODUCTO AL CARRITO
+
+  // ==================== AGREGAR PRODUCTO ====================
   async addToCart(customerId: number, dto: AddToCartDto) {
     const cart = await this.getCart(customerId);
 
@@ -78,7 +79,8 @@ export class CartService {
     return this.getCart(customerId);
   }
 
-  // EDITAR CANTIDAD DE ITEM
+
+  // ==================== EDITAR CANT. ====================
   async updateCartItem(customerId: number, itemId: number, dto: UpdateCartItemDto) {
   const cart = await this.getCart(customerId);
 
@@ -119,7 +121,8 @@ export class CartService {
   return this.getCart(customerId);
 }
 
-  // ELIMINAR ITEM DEL CARRITO
+
+  // ==================== ELIMINAR ITEM ====================
   async removeCartItem(customerId: number, itemId: number) {
   const cart = await this.getCart(customerId);
 

@@ -12,6 +12,7 @@ export class CartController {
     return this.cartService.getCart(customerId);
   }
 
+
   @Post('add/:customerId')
   async addToCart(
     @Param('customerId') customerId: number,
@@ -20,6 +21,7 @@ export class CartController {
     return this.cartService.addToCart(customerId, dto);
   }
 
+  
   @Put('update/:customerId/:itemId')
   async updateCartItem(
     @Param('customerId') customerId: number,
@@ -29,6 +31,7 @@ export class CartController {
     return this.cartService.updateCartItem(customerId, itemId, dto);
   }
 
+  
   @Delete('remove/:customerId/:itemId')
   async removeCartItem(
     @Param('customerId') customerId: number,
