@@ -1,6 +1,7 @@
+// src/auth/dto/register-by-admin.dto.ts
 import { IsEmail, IsString, MinLength } from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterByAdminDto {
   @IsEmail()
   email: string;
 
@@ -13,8 +14,10 @@ export class CreateUserDto {
 
   @IsString()
   ci: string;
-  
+
   @IsString()
   phone: string;
-  //nombre, ci, telf
+
+  @IsString()
+  roleName: string; // Vendedor, Repartidor, etc
 }
