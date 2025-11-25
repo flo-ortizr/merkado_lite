@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, NotFoundException } from "@nestjs/common";
 import { AppDataSource } from "src/data-source";
 import { Cart } from "./cart.entity";
 import { CartItem } from "src/cart_item/cart_item.entity";
@@ -20,7 +20,7 @@ export class CartService {
 
     if (!cart) {
       const customer = await AppDataSource.manager.findOneBy(Customer, { id_customer: customerId });
-      if (!customer) throw new Error('Cliente no encontrado');
+      if (!customer) throw new NotFoundException('Cliente no encontrado');
 
       cart = AppDataSource.manager.create(Cart, {
         customer,
@@ -41,14 +41,14 @@ export class CartService {
 
     // verificar producto
     const product = await AppDataSource.manager.findOneBy(Product, { id_product: dto.productId });
-    if (!product) throw new Error('Producto no encontrado');
+    if (!product) throw new NotFoundException('Producto no encontrado');
 
     // verificar inventario
     const inventory = await AppDataSource.manager.findOne(Inventory, {
       where: { product: { id_product: dto.productId } }
     });
 
-    if (!inventory) throw new Error('Inventario no encontrado');
+    if (!inventory) throw new NotFoundException('Inventario no encontrado');
 
     // validar stock
     if (inventory.quantity < dto.quantity) {
@@ -85,14 +85,14 @@ export class CartService {
   const cart = await this.getCart(customerId);
 
   const item = cart.items.find(i => i.id_cart_item === itemId);
-  if (!item) throw new Error('Item no encontrado');
+  if (!item) throw new NotFoundException('Item no encontrado');
 
   // Inventario del producto
   const inventory = await AppDataSource.manager.findOne(Inventory, {
     where: { product: { id_product: item.product.id_product } }
   });
 
-  if (!inventory) throw new Error('Inventario no encontrado');
+  if (!inventory) throw new NotFoundException('Inventario no encontrado');
 
   const cantidadAnterior = item.quantity;
   const cantidadNueva = dto.quantity;
@@ -101,7 +101,7 @@ export class CartService {
   // Si necesita más cantidad
   if (diferencia > 0) {
     if (inventory.quantity < diferencia) {
-      throw new Error('Stock insuficiente');
+      throw new BadRequestException('Stock insuficiente');
     }
     inventory.quantity -= diferencia;
   }
@@ -127,13 +127,13 @@ export class CartService {
   const cart = await this.getCart(customerId);
 
   const item = cart.items.find(i => i.id_cart_item === itemId);
-  if (!item) throw new Error('Item no encontrado');
+  if (!item) throw new NotFoundException('Item no encontrado');
 
   const inventory = await AppDataSource.manager.findOne(Inventory, {
     where: { product: { id_product: item.product.id_product } }
   });
 
-  if (!inventory) throw new Error('Inventario no encontrado');
+  if (!inventory) throw new NotFoundException('Inventario no encontrado');
 
   // Devolver toda la cantidad al inventario
   inventory.quantity += item.quantity;

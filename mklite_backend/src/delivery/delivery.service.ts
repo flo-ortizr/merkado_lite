@@ -10,7 +10,7 @@ import { ScheduleDeliveryDto } from './dto/schedule_delivery.dto';
 @Injectable()
 export class DeliveryService {
 
-  // 1. El repartidor se asigna un pedido
+  // ==================== ASIGNAR ENTREGA A REPARTIDOR ====================
   async assignDelivery(dto: AssignDeliveryDto) {
 
     const order = await AppDataSource.manager.findOne(Order, {
@@ -35,7 +35,8 @@ export class DeliveryService {
     return AppDataSource.manager.save(Delivery, delivery);
   }
 
-  // 2. Actualizar estado de entrega
+
+  // ==================== ACTUALIZAR ESTADO DE ENTREGA ====================
   async updateStatus(dto: UpdateDeliveryStatusDto) {
     const delivery = await AppDataSource.manager.findOne(Delivery, {
       where: { id_delivery: dto.id_delivery },
@@ -64,7 +65,7 @@ export class DeliveryService {
     return AppDataSource.manager.save(Delivery, delivery);
   }
 
-  // 3. Obtener pedidos asignados a un repartidor
+  // ==================== Obtener pedidos asignados a un repartidor ====================
   async getDeliveriesByDriver(driverId: number) {
     return AppDataSource.manager.find(Delivery, {
       where: { driver: { id_user: driverId } },
