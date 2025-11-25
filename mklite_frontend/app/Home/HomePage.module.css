@@ -7,14 +7,14 @@
   min-height: 100vh;
 }
 
-/* --- Header (FIJO ARRIBA - ROJO) --- */
+/* --- Header (MEJORADO) --- */
 .header {
   background-color: #E60012; /* Rojo Coca-Cola */
   color: #fff;
-  padding: 10px;
+  padding: 15px 0;
   position: sticky;
   top: 0;
-  z-index: 1000; /* Encima de todo */
+  z-index: 1000; 
   box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
 }
 
@@ -22,10 +22,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0;
-  padding: 10px 20px;
+  padding: 0 30px;
   max-width: 1400px;
   margin: 0 auto;
+  gap: 40px; /* Espacio entre logo, buscador y nav */
 }
 
 .logo {
@@ -33,16 +33,19 @@
   font-size: 28px;
   color: #fff;
   letter-spacing: -1px;
+  white-space: nowrap; /* Para que no se rompa en dos líneas */
 }
 
+/* Buscador estilo píldora ancha */
 .searchBar {
-  padding: 10px 20px;
-  width: 500px;
-  border-radius: 30px;
+  flex-grow: 1; /* Ocupa todo el espacio disponible */
+  max-width: 700px; /* Pero no más de 700px */
+  padding: 12px 25px;
+  border-radius: 50px;
   border: none;
   background-color: #fff;
   color: #333;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -50,39 +53,53 @@
 .userNav {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 30px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 16px;
+  white-space: nowrap;
 }
 
-/* Estilos del Carrito en el Header */
+/* --- Carrito en Header (SOLO ICONO) --- */
 .cartContainer {
-  display: flex;
-  align-items: center;
   position: relative;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
 }
 
-.cartIcon {
-  font-size: 24px;
+/* Icono SVG del header */
+.headerCartIcon {
+  width: 32px;
+  height: 32px;
+  color: #fff; /* Blanco */
+  transition: transform 0.2s;
 }
 
+.cartContainer:hover .headerCartIcon {
+  transform: scale(1.1);
+}
+
+/* Burbuja de contador (Cantidad de productos únicos) */
 .cartBadge {
-  background-color: #1a1a1a; /* Negro */
+  background-color: #1a1a1a; /* Negro para resaltar en el rojo */
   color: #fff;
   font-size: 12px;
   font-weight: bold;
   height: 20px;
-  width: 20px;
-  border-radius: 50%;
+  min-width: 20px; /* Se estira si es 10+ */
+  padding: 0 5px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: -8px;
-  right: 40px; /* Ajustado a la posición del texto "Carrito" */
-  border: 2px solid #E60012;
+  top: -5px;
+  right: -5px; 
+  border: 2px solid #E60012; /* Borde del mismo color del header */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 /* --- Banner Principal --- */
@@ -167,10 +184,8 @@
   background-color: #fff;
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
-  
-  /* Se pega debajo del header */
   position: sticky;
-  top: 76px; /* Ajustar si queda espacio o solapa */
+  top: 86px; /* Ajustado por el nuevo padding del header */
   z-index: 900;
   box-shadow: 0 4px 6px -2px rgba(0,0,0,0.1);
 }
@@ -192,7 +207,6 @@
   background-color: #fff0f0;
 }
 
-/* Estilo para la categoría activa (Fondo Negro) */
 .categoryLinkActive {
   background-color: #1a1a1a !important;
   color: #fff !important;
@@ -209,8 +223,8 @@
 
 .productShelf {
   margin-bottom: 60px;
-  padding-top: 140px; /* Espacio para compensar el header fijo */
-  margin-top: -120px; /* Truco del ancla */
+  padding-top: 150px; 
+  margin-top: -130px; 
 }
 
 .shelfTitle {
@@ -225,7 +239,7 @@
 
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 columnas */
+  grid-template-columns: repeat(5, 1fr); 
   gap: 20px;
 }
 
@@ -262,7 +276,7 @@
 }
 
 .productCard:hover .cardImage {
-  transform: scale(1.08); /* Zoom suave */
+  transform: scale(1.08); 
 }
 
 .cardContent {
@@ -288,12 +302,12 @@
 .cardPrice {
   font-size: 18px;
   font-weight: 800;
-  color: #1E1E1E; /* Negro */
+  color: #1E1E1E; 
   margin-bottom: 10px;
   display: block;
 }
 
-/* --- Fila de Acción (Selector + Botón Agregar) --- */
+/* --- Fila de Acción --- */
 .actionRow {
   display: flex;
   align-items: center;
@@ -342,7 +356,7 @@
 
 .addButton {
   flex-grow: 1;
-  background-color: #1a1a1a; /* Negro */
+  background-color: #1a1a1a; 
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -382,31 +396,26 @@
   box-shadow: 0 25px 50px rgba(0,0,0,0.2);
 }
 
-/* Botón "X" Mejorado (Círculo Negro, X Blanca) */
 .modalCloseButton {
   position: absolute;
   top: 15px;
   right: 15px;
-  background: #1E1E1E; 
-  color: #fff; 
-  border: 2px solid #fff;
-  border-radius: 50%;
-  width: 40px; 
-  height: 40px;
+  color: #999; 
+  background: transparent;
+  border: none;
+  width: 30px; 
+  height: 30px;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  transition: background-color 0.2s, transform 0.2s;
+  font-size: 24px;
+  line-height: 1;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .modalCloseButton:hover {
-  background-color: #E60012; /* Se pone rojo al pasar */
-  transform: rotate(90deg);
-  border-color: #E60012;
+  color: #E60012; 
 }
 
 .modalContent {
@@ -416,14 +425,13 @@
 
 .modalImage {
   flex: 1;
-  background-color: #f7f7f7;
+  background-color: #fff;
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 400px;
-  color: #aaa;
-  font-size: 18px;
+  border: 1px solid #eee;
 }
 
 .modalInfo {
@@ -431,95 +439,132 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start; 
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .modalTitle {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   color: #1E1E1E;
   line-height: 1.2;
 }
 
+.modalSubtitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 5px;
+}
+
 .modalDescription {
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   line-height: 1.6;
 }
 
+.modalCategory {
+  color: #E60012;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
 .modalPrice {
-  font-size: 28px; /* Precio Negro y más pequeño */
+  font-size: 36px;
   font-weight: 900;
   color: #1E1E1E; 
-  margin: 15px 0;
+  margin: 10px 0 15px 0; 
 }
 
-.modalButtonsContainer {
+.statusBadge {
+  background-color: #E60012;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block; 
+  margin-bottom: 25px; 
+  align-self: flex-start; 
+}
+
+.modalFooter {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-top: 30px;
+  justify-content: space-between; 
+  gap: 15px; 
+  margin-top: auto;
+  width: 100%;
 }
 
-/* Selector de cantidad en Modal (Más grande) */
 .qtySelectorModal {
   display: flex;
   align-items: center;
-  background-color: #f4f4f4;
-  border-radius: 30px;
-  padding: 5px;
-  border: 1px solid #e0e0e0;
+  background-color: #f4f4f4; 
+  border-radius: 30px; 
+  padding: 4px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  flex-shrink: 0; 
 }
 
 .qtyBtnModal {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background-color: #fff;
   color: #333;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  transition: background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.1s ease;
 }
 
-.qtyBtnModal:hover {
-  background-color: #e0e0e0;
+.qtyBtnModal:active {
+  transform: scale(0.95);
 }
 
 .qtyValueModal {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  min-width: 40px;
-  text-align: center;
-  margin: 0 10px;
-}
-
-.modalButton {
-  flex-grow: 1; 
-  background-color: #E60012; /* Botón Rojo */
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 15px 25px;
-  cursor: pointer;
   font-size: 18px;
   font-weight: bold;
-  transition: background-color 0.2s;
-  box-shadow: 0 5px 15px rgba(230, 0, 18, 0.3);
+  color: #333;
+  min-width: 30px;
+  text-align: center;
+  margin: 0 10px;
+  font-family: monospace; 
 }
 
-.modalButton:hover {
+.btnAddPrimary {
+  flex: 1; 
+  background-color: #E60012;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  gap: 10px; 
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 15px rgba(230, 0, 18, 0.2);
+}
+
+.btnAddPrimary:hover {
   background-color: #cc000f;
 }
+
 
 /* --- Ventana de Confirmación --- */
 .confirmationWindow {
@@ -576,7 +621,7 @@
   padding: 12px;
   border-radius: 8px;
   border: none;
-  background-color: #1a1a1a; /* Negro */
+  background-color: #1a1a1a; 
   color: #fff;
   font-weight: bold;
   cursor: pointer;

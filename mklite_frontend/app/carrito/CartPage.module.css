@@ -109,7 +109,7 @@
   margin: 0 0 8px 0;
 }
 
-/* Selector de Cantidad (Estilo Home) */
+/* Selector de Cantidad */
 .qtySelector {
   display: inline-flex;
   align-items: center;
@@ -193,6 +193,84 @@
   margin-bottom: 15px;
   font-size: 16px;
   color: #555;
+}
+
+/* --- NUEVO: Sección de Cupón --- */
+.couponContainer {
+  margin: 20px 0;
+  padding: 15px 0;
+  border-top: 1px dashed #e0e0e0;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+.couponLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.couponInputGroup {
+  display: flex;
+  gap: 10px;
+}
+
+.couponInput {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  background-color: #f9f9f9;
+}
+
+.couponInput:focus {
+  border-color: #1a1a1a;
+  background-color: #fff;
+}
+
+.applyBtn {
+  background-color: #1a1a1a; /* Negro */
+  color: #fff;
+  border: none;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.applyBtn:hover {
+  background-color: #333;
+}
+
+/* Mensajes de Cupón */
+.couponMessage {
+  font-size: 13px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.msgSuccess {
+  color: #28a745;
+}
+
+.msgError {
+  color: #dc3545;
+}
+
+/* Fila de descuento (Rojo) */
+.discountRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #E60012; 
+  font-weight: bold;
 }
 
 .totalRow {

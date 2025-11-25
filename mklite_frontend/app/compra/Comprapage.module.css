@@ -1,0 +1,411 @@
+/* app/compra/Comprapage.module.css */
+
+.container {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Header --- */
+.header {
+  background-color: #E60012;
+  color: #fff;
+  padding: 15px 0;
+  box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+  text-align: center;
+}
+
+.headerContent {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 25px;
+  font-weight: 900;
+  font-size: 26px;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+}
+
+/* --- Main Content Layout --- */
+.mainContent {
+  display: flex;
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 25px;
+  gap: 30px;
+  flex-grow: 1;
+}
+
+.checkoutForms {
+  flex: 2;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 30px;
+}
+
+/* --- Tabs --- */
+.tabsNav {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid #eee;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+}
+
+.tabItem {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: #999;
+  position: relative;
+  transition: color 0.3s;
+}
+
+.tabItemActive {
+  color: #E60012;
+}
+
+.tabItemActive::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #E60012;
+  border-radius: 2px;
+}
+
+/* --- Formularios --- */
+.formSection {
+  margin-bottom: 40px;
+}
+
+.sectionTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="number"],
+.formGroup select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  color: #333;
+  background-color: #fff;
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  border-color: #E60012;
+  outline: none;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 0.8fr;
+  gap: 20px;
+}
+
+/* --- MAPA INCRUSTADO --- */
+.embeddedMapContainer {
+    width: 100%;
+    height: 350px; /* Altura fija OBLIGATORIA */
+    background-color: #e0e0e0;
+    border-radius: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    overflow: hidden;
+    position: relative;
+    z-index: 0; /* Bajamos el z-index para que no tape selects */
+}
+
+.mapInstructions {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+.loadingMap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    color: #666;
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+/* --- Entrega Inmediata --- */
+.immediateDeliveryBox {
+    background-color: #fff5f5;
+    border: 1px solid #ffcccc;
+    color: #cc0000;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* --- Radio Buttons --- */
+.radioOptionContainer {
+    margin-bottom: 15px;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 15px 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #fff;
+  transition: all 0.2s;
+}
+
+.radioOption:hover {
+  border-color: #E60012;
+  box-shadow: 0 2px 8px rgba(230, 0, 18, 0.1);
+}
+
+.radioOption input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 15px;
+  accent-color: #E60012;
+}
+
+.radioOption label {
+  flex-grow: 1;
+  font-weight: 600;
+  color: #333;
+}
+
+.priceInfo {
+  font-weight: 700;
+  color: #E60012;
+  font-size: 15px;
+}
+
+.gratis {
+    color: #28a745;
+}
+
+/* --- Sidebar Resumen --- */
+.summarySidebar {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 30px;
+  height: fit-content;
+  position: sticky;
+  top: 30px;
+}
+
+.summaryTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.summaryProducts {
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 15px;
+  background-color: #fcfcfc;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.summaryItemImage {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryItemDetails {
+  flex-grow: 1;
+}
+
+.summaryItemDetails h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 3px 0;
+}
+
+.summaryItemDetails p {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+}
+
+.summaryItemPrice {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  flex-shrink: 0;
+}
+
+.summaryTotals {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.summaryTotalRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #555;
+}
+
+.summaryTotalRow strong {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.deliveryPriceDynamic {
+    color: #E60012;
+    font-weight: 900;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.discountText {
+  color: #E60012 !important;
+  font-weight: bold;
+}
+
+.summaryTotalFinal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #E60012;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.summaryTotalFinal span {
+  color: #E60012;
+}
+
+/* --- Botones --- */
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  gap: 20px;
+}
+
+.navigationButton {
+  padding: 15px 25px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.backButton {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.backButton:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.nextButton {
+  background-color: #E60012;
+  color: #fff;
+}
+
+.nextButton:hover {
+  background-color: #cc000f;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.footer a {
+  color: #888;
+  text-decoration: none;
+}
+
+.datePickerInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

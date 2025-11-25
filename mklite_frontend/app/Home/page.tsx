@@ -20,7 +20,11 @@ type ProductCardProps = {
 };
 
 type ProductShelfProps = {
+<<<<<<< HEAD
   id: string;
+=======
+  id: string; 
+>>>>>>> Frontend/HU-F04.1
   title: string;
   products: Product[];
   forwardRef: React.RefObject<HTMLElement | null>; 
@@ -93,7 +97,6 @@ const ProductCard = ({ product, onCardClick, onAddToCart }: ProductCardProps) =>
 };
 
 const ProductShelf = ({ id, title, products, forwardRef, onProductClick, onAddToCart }: ProductShelfProps) => (
-  // Añadimos el ID a la sección para que el observador sepa cuál es
   <section id={id} ref={forwardRef} className={styles.productShelf}>
     <h2 className={styles.shelfTitle}>{title}</h2>
     <div className={styles.productGrid}>
@@ -104,39 +107,68 @@ const ProductShelf = ({ id, title, products, forwardRef, onProductClick, onAddTo
   </section>
 );
 
+// --- 3. COMPONENTE MODAL ---
 const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
   if (!product) return null;
+
   const [quantityModal, setQuantityModal] = useState(1);
-  const handleIncrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => prev + 1); };
-  const handleDecrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => (prev > 1 ? prev - 1 : 1)); };
+
+  const handleIncrementModal = (e: React.MouseEvent) => { 
+    e.stopPropagation(); 
+    setQuantityModal(prev => prev + 1); 
+  };
+  
+  const handleDecrementModal = (e: React.MouseEvent) => { 
+    e.stopPropagation(); 
+    setQuantityModal(prev => (prev > 1 ? prev - 1 : 1)); 
+  };
+
   const handleAddToCartModal = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart(product, quantityModal);
-    setQuantityModal(1);
+    onAddToCart(product, quantityModal); 
+    setQuantityModal(1); 
     onClose(); 
   };
 
   return (
     <div onClick={onClose} className={styles.modalBackdrop}>
       <div onClick={(e) => e.stopPropagation()} className={styles.modalWindow}>
-        <button onClick={onClose} className={styles.modalCloseButton}>X</button>
+        <button onClick={onClose} className={styles.modalCloseButton}>×</button>
+        
         <div className={styles.modalContent}>
           <div className={styles.modalImage}>
              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+<<<<<<< HEAD
                <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain' }} />
+=======
+               <Image src={product.image} alt={product.nombre} fill style={{ objectFit: 'contain', padding: '20px' }} />
+>>>>>>> Frontend/HU-F04.1
              </div>
           </div>
+
           <div className={styles.modalInfo}>
             <h1 className={styles.modalTitle}>{product.nombre}</h1>
+            <div className={styles.modalSubtitle}>Descripción del Producto:</div>
             <p className={styles.modalDescription}>{product.description}</p>
+            <div className={styles.modalCategory}>Categoría: General</div>
             <h2 className={styles.modalPrice}>{product.precio}</h2>
-            <div className={styles.modalButtonsContainer}>
+
+            <span className={styles.statusBadge}>Disponible</span>
+
+            <div className={styles.modalFooter}>
               <div className={styles.qtySelectorModal}>
                 <button onClick={handleDecrementModal} className={styles.qtyBtnModal}>-</button>
                 <span className={styles.qtyValueModal}>{quantityModal}</span>
                 <button onClick={handleIncrementModal} className={styles.qtyBtnModal}>+</button>
               </div>
-              <button onClick={handleAddToCartModal} className={styles.modalButton}>🛒 Añadir al Carrito</button>
+              <button onClick={handleAddToCartModal} className={styles.btnAddPrimary}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                Añadir al carrito
+              </button>
             </div>
           </div>
         </div>
@@ -145,11 +177,10 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
   );
 };
 
-// --- 6. Componente Principal ---
+// --- 4. Componente Principal ---
 export default function HomePage() {
   const router = useRouter(); 
   
-  // Refs para cada sección
   const categoryRefs = {
     abarrotes: useRef<HTMLElement | null>(null),
     bebidas: useRef<HTMLElement | null>(null),
@@ -173,14 +204,13 @@ export default function HomePage() {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-150px 0px -70% 0px', // Ajuste para detectar cuando la sección está arriba
+      rootMargin: '-150px 0px -70% 0px', 
       threshold: 0
     };
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // Cuando una sección entra en la zona visible, actualizamos el estado
           setActiveCategory(entry.target.id);
         }
       });
@@ -188,14 +218,12 @@ export default function HomePage() {
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-    // Observamos todas las secciones
     Object.values(categoryRefs).forEach((ref) => {
       if (ref.current) observer.observe(ref.current);
     });
 
     return () => observer.disconnect();
   }, []);
-
 
   const handleScrollTo = (key: string) => {
     const ref = categoryRefs[key as keyof typeof categoryRefs];
@@ -207,14 +235,13 @@ export default function HomePage() {
     }
   };
 
-  // Cargar carrito
+  // Cargar carrito (Contar ITEMS ÚNICOS, no cantidad total)
   useEffect(() => {
     const cartJson = localStorage.getItem('mklite_cart');
     if (cartJson) {
       const cart = JSON.parse(cartJson);
-      // @ts-ignore
-      const totalQty = cart.reduce((acc, item) => acc + item.quantity, 0);
-      setCartCount(totalQty);
+      // Ahora contamos la longitud del array (número de productos distintos)
+      setCartCount(cart.length);
     }
   }, []);
 
@@ -231,13 +258,15 @@ export default function HomePage() {
     const existingItemIndex = cart.findIndex((item) => item.id === product.id);
 
     if (existingItemIndex >= 0) {
+      // Si ya existe, aumentamos la cantidad, PERO NO el contador del header
       cart[existingItemIndex].quantity += qty;
     } else {
+      // Si es nuevo, lo agregamos Y aumentamos el contador del header
       cart.push({ ...product, quantity: qty, priceNumeric: priceNum });
+      setCartCount(prev => prev + 1); 
     }
     localStorage.setItem('mklite_cart', JSON.stringify(cart));
 
-    setCartCount(prev => prev + qty); 
     setIsConfirmationOpen(true); 
   };
 
@@ -277,13 +306,24 @@ export default function HomePage() {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.logo}>MERCADO LITE</div>
+          
+          {/* Buscador ancho estilo píldora */}
           <input type="text" placeholder="¿Qué estás buscando?" className={styles.searchBar} />
+          
           <div className={styles.userNav}>
             <span>Cuenta</span>
+            
+            {/* Carrito SOLO ICONO */}
             <div className={styles.cartContainer} onClick={handleGoToCart}>
-              <span className={styles.cartIcon}>🛒</span>
+              {/* Icono SVG igual al del modal */}
+              <svg className={styles.headerCartIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+
+              {/* Burbuja de cantidad (Items Únicos) */}
               {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
-              <span style={{ marginLeft: '8px' }}>Carrito</span>
             </div>
           </div>
         </div>
@@ -305,7 +345,6 @@ export default function HomePage() {
             <span 
               key={cat.key}
               onClick={() => handleScrollTo(cat.key)} 
-              // Comparamos la categoría activa con la clave de la lista
               className={`${styles.categoryLink} ${activeCategory === cat.key ? styles.categoryLinkActive : ''}`}
             >
               {cat.label}
