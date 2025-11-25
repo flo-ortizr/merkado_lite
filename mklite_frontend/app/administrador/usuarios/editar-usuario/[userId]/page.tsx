@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 // =================================================================
 // 1. CONSTANTES Y DATOS MOCKEADOS
 // =================================================================
-
-// Simulación del usuario que se está editando
 const MOCKED_USER_DATA = {
     id: 'user-001',
     nombreCompleto: 'Ana Gómez',
     email: 'ana.gomez@empresa.cl',
     rolAsignado: 'ADMIN',
     estado: 'Activo',
-    // Permisos iniciales para Ana Gómez (Administradora)
     permisosEspecificos: [
         'gestion_usuarios', 'ver_reportes', 'gestion_stock', 
         'gestion_ordenes', 'registro_ventas', 'ver_inventario', 
@@ -21,7 +19,6 @@ const MOCKED_USER_DATA = {
     ],
 };
 
-// Lista de todos los permisos posibles
 const ALL_PERMISSIONS = [
     { id: 'gestion_usuarios', name: 'Gestionar Usuarios y Roles' },
     { id: 'ver_reportes', name: 'Ver Todos los Reportes (Ventas, Stock, Personal)' },
@@ -34,7 +31,6 @@ const ALL_PERMISSIONS = [
     { id: 'ver_finanzas', name: 'Ver Reportes Financieros' }, 
 ];
 
-// Definición de Roles disponibles
 const ROLES_DATA = [
     { id: 'ADMIN', name: 'Administrador' },
     { id: 'VENTAS', name: 'Vendedor (Ventas Físicas)' },
@@ -42,15 +38,14 @@ const ROLES_DATA = [
     { id: 'REPARTIDOR', name: 'Repartidor' },
 ];
 
-// Opciones de Estado del usuario
 const STATUS_OPTIONS = ['Activo', 'Inactivo', 'Suspendido'];
 
 // =================================================================
 // 2. COMPONENTE PRINCIPAL
 // =================================================================
-
 const EditarUsuarioForm = () => {
-    // Estado inicial del formulario basado en los datos simulados
+    const router = useRouter(); // ✅ hook dentro del componente
+
     const [formData, setFormData] = useState({
         nombreCompleto: MOCKED_USER_DATA.nombreCompleto,
         email: MOCKED_USER_DATA.email,
@@ -59,36 +54,29 @@ const EditarUsuarioForm = () => {
         permisosEspecificos: MOCKED_USER_DATA.permisosEspecificos,
         isSubmitting: false,
     });
-    
-    // Estado para la notificación/mensaje
+
     const [message, setMessage] = useState(null);
 
-    // --- Handlers de Formulario ---
-
-    // Maneja los cambios en inputs y selectores (Rol, Estado, Nombre, Email)
+    // --- Handlers ---
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Maneja los cambios en los checkboxes de Permisos Específicos
     const handlePermissionChange = (permissionId) => {
         setFormData(prev => {
             const currentPerms = prev.permisosEspecificos;
             const newPerms = currentPerms.includes(permissionId)
-                ? currentPerms.filter(id => id !== permissionId) // Deseleccionar
-                : [...currentPerms, permissionId]; // Seleccionar
-            
+                ? currentPerms.filter(id => id !== permissionId)
+                : [...currentPerms, permissionId];
             return { ...prev, permisosEspecificos: newPerms };
         });
     };
 
-    // Simula el envío del formulario (Guardar Cambios)
     const handleSubmit = (e) => {
         e.preventDefault();
         setFormData(prev => ({ ...prev, isSubmitting: true }));
-        
-        // Simulación de una llamada API con retraso
+
         setTimeout(() => {
             setFormData(prev => ({ ...prev, isSubmitting: false }));
             setMessage({
@@ -98,16 +86,11 @@ const EditarUsuarioForm = () => {
         }, 1500);
     };
 
-    // Simula la cancelación
     const handleCancel = () => {
-        setMessage({
-            type: 'info',
-            text: 'Edición cancelada. Volviendo al listado de usuarios (Simulación).',
-        });
-        // Aquí se podría resetear el estado o navegar de vuelta
+        router.push('/administrador/usuarios/lista'); // ✅ redirección funcionando
     };
 
-    // Componente Input reutilizable
+    // Componentes reutilizables
     const InputField = ({ label, name, value, placeholder, type = 'text' }) => (
         <div className="flex flex-col">
             <label htmlFor={name} className="text-sm font-semibold text-gray-400 mb-1">{label}</label>
@@ -123,8 +106,7 @@ const EditarUsuarioForm = () => {
             />
         </div>
     );
-    
-    // Componente Select reutilizable
+
     const SelectField = ({ label, name, value, options }) => (
         <div className="flex flex-col">
             <label htmlFor={name} className="text-sm font-semibold text-gray-400 mb-1">{label}</label>
@@ -145,19 +127,13 @@ const EditarUsuarioForm = () => {
     );
 
     // --- Renderizado ---
-
     return (
-        // Contenedor principal para centrar el formulario en la pantalla
         <div className="min-h-screen p-4 sm:p-8 bg-gray-900 flex justify-center items-center">
             <div className="w-full max-w-3xl bg-gray-800 rounded-xl shadow-2xl p-6 sm:p-8">
-                
-                {/* Título Principal */}
-                {/* El color y el borde imitan el estilo de la imagen */}
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-red-500 border-b-4 border-red-600 pb-3 mb-6">
                     Editar Usuario
                 </h1>
-                
-                {/* Mensaje de Notificación (simulación de modal/toast) */}
+
                 {message && (
                     <div 
                         className={`p-4 mb-6 rounded-lg font-semibold shadow-xl transition-opacity duration-300 ${
@@ -171,10 +147,8 @@ const EditarUsuarioForm = () => {
                         <button onClick={() => setMessage(null)} className="float-right text-lg font-bold ml-4">&times;</button>
                     </div>
                 )}
-                
+
                 <form onSubmit={handleSubmit}>
-                    
-                    {/* Sección: Información Básica (Nombre, Email) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <InputField
                             label="Nombre Completo"
@@ -191,16 +165,13 @@ const EditarUsuarioForm = () => {
                         />
                     </div>
 
-                    {/* Sección: Rol y Estado */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        {/* Se filtra la lista de roles para el Select Field */}
                         <SelectField
                             label="Rol Asignado"
                             name="rolAsignado"
                             value={formData.rolAsignado}
                             options={ROLES_DATA}
                         />
-                        {/* Se usa el array de opciones de estado para el Select Field */}
                         <SelectField
                             label="Estado"
                             name="estado"
@@ -209,16 +180,12 @@ const EditarUsuarioForm = () => {
                         />
                     </div>
 
-                    {/* Sección: Permisos Específicos */}
                     <div className="bg-gray-900 p-5 sm:p-6 rounded-xl shadow-lg border border-gray-700">
                         <h2 className="text-xl font-bold text-gray-200 mb-4">
                             Permisos Específicos (Ajustados por Rol)
                         </h2>
-                        
-                        {/* Permisos como Checkboxes en 3 columnas con altura uniforme */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                             {ALL_PERMISSIONS.map(permission => (
-                                // Aplicamos flex y h-full para asegurar que cada "cuadrado" de permiso sea del mismo tamaño
                                 <div key={permission.id} className="flex flex-col w-full h-full"> 
                                     <label 
                                         className="flex items-start bg-gray-700 p-3 rounded-lg border border-gray-600 hover:bg-gray-600 transition duration-150 cursor-pointer h-full"
@@ -229,7 +196,6 @@ const EditarUsuarioForm = () => {
                                             id={`permiso-${permission.id}`}
                                             checked={formData.permisosEspecificos.includes(permission.id)}
                                             onChange={() => handlePermissionChange(permission.id)}
-                                            // Estilo del checkbox en rojo, similar al diseño
                                             className="form-checkbox h-5 w-5 mt-1 text-red-600 bg-gray-800 border-gray-500 rounded focus:ring-red-500 transition duration-150 flex-shrink-0"
                                         />
                                         <span className="ml-3 leading-tight text-gray-300">
@@ -241,7 +207,6 @@ const EditarUsuarioForm = () => {
                         </div>
                     </div>
 
-                    {/* Botones de Acción */}
                     <div className="flex justify-end space-x-4 mt-8">
                         <button
                             type="button"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-
+import { useRouter } from 'next/navigation';
 // =================================================================
 // 1. CONSTANTES Y DATOS MOCKEADOS (Simulando BBDD de Pedidos y Productos)
 // =================================================================
@@ -108,7 +108,7 @@ const GestionPedidosRepartidor = () => {
                 return 'bg-gray-500';
         }
     };
-
+const router = useRouter();
     // Al seleccionar un pedido de la lista
     const handleSelectOrder = useCallback((order) => {
         setSelectedOrder(order);
@@ -181,16 +181,28 @@ const GestionPedidosRepartidor = () => {
         setIncidences('');
     }, [selectedOrder, orders, newStatus, incidences, isProcessing]);
 
-
+const handleLogout = () => {
+        
+        router.push('/'); 
+    };
     return (
         <div className="min-h-screen p-6 bg-gray-900 text-gray-100 font-sans flex justify-center">
-            {/* Opcional: Estilo de Scrollbar si usas el plugin tailwind-scrollbar */}
-            {/* <style jsx global>{`
-                .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
-                .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #4a5568; border-radius: 4px; }
-                .scrollbar-thin::-webkit-scrollbar-track { background-color: #2d3748; }
-            `}</style> */}
-
+                       <button 
+                onClick={handleLogout} 
+                style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                }}
+            >
+                Cerrar Sesión
+            </button>
             <div className="w-full max-w-6xl bg-gray-800 rounded-xl shadow-2xl p-6">
                 <header className="mb-6 flex justify-between items-center border-b border-red-700 pb-4">
                     <h1 className="text-3xl font-extrabold text-red-500 flex items-center">
