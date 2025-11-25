@@ -1,9 +1,31 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Delete, Get, Param, Put, Query, Post, Body } from "@nestjs/common";
 import { ProductService } from "./product.service";
+import { CreateProductDto } from "./dto/create_product.dto";
+import { UpdateProductDto } from "./dto/update_product.dto";
 
 @Controller('/product')
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
+
+    @Get('/catalog')
+    getCatalog() {
+        return this.productService.getCatalog();
+    }
+
+    @Get('/category/:id')
+    getByCategory(@Param('id') id: number) {
+        return this.productService.getByCategory(id);
+    }
+
+    @Get('/search')
+    search(@Query('q') query: string) {
+        return this.productService.searchProducts(query);
+    }
+
+    @Get('/filter/price')
+    filterByPrice(@Query('min') min: number, @Query('max') max: number) {
+        return this.productService.filterByPrice(min, max);
+    }
 
     @Get()
     getAllProducts() {
@@ -11,17 +33,22 @@ export class ProductController {
     }
 
     @Get('/:id')
-    getProductById(@Param() params: any) {
-        return this.productService.getProductById(params.id);
+    getProductById(@Param('id') id: number) {
+        return this.productService.getProductById(id);
     }
 
-    @Get('/category/:category')
-    getProductsByCategory(@Param() params: any) {
-        return this.productService.getProductsByCategory(params.category);
+    @Post()
+    createProduct(@Body() dto: CreateProductDto) {
+        return this.productService.createProduct(dto);
     }
 
-    @Get('/supplier/:id_supplier')
-    getProductsBySupplier(@Param() params: any) {
-        return this.productService.getProductsBySupplier(params.id_supplier);
+    @Put('/:id')
+    updateProduct(@Param('id') id: number, @Body() dto: UpdateProductDto) {
+        return this.productService.updateProduct(id, dto);
+    }
+
+    @Delete('/:id')
+    deleteProduct(@Param('id') id: number) {
+        return this.productService.deleteProduct(id);
     }
 }

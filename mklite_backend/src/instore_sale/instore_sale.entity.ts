@@ -20,6 +20,12 @@ export class InStoreSale {
   @Column()
   payment_method: string;
 
+  @Column({ type: 'enum', enum: ['completed', 'cancelled'], default: 'completed' })
+  status: string;
+  
+  @Column({ nullable: true })
+  cancel_reason: string;
+
   @OneToMany(() => InStoreSaleDetail, (detail) => detail.sale)
   details: InStoreSaleDetail[];
 }

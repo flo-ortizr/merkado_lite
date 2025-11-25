@@ -1,22 +1,45 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable} from "@nestjs/common";
+import { BadRequestException } from "@nestjs/common";
 import { AppDataSource } from "src/data-source";
 import { Notification } from "./notification.entity";
+import { User } from "src/user/user.entity";
 
 @Injectable()
 export class NotificationService {
+    
+    // ==================== ENVIAR NOTIF ====================
     async sendNotification(message: string, userId: number) {
-        // Lógica para enviar una notificación al usuario con userId
-        console.log(`Enviando notificación al usuario ${userId}: ${message}`);
-        // Aquí podrías integrar con un servicio de correo electrónico, SMS, etc.
+        const user = await AppDataSource.manager.findOne(User, { where: { id_user: userId } });
+        if (!user) {
+            console.log(`User ${userId} not found for notification`);
+            return;
+        }
+
+        const notif = AppDataSource.manager.create(Notification, {
+            user,
+            message,
+            read: false
+        });
+
+        await AppDataSource.manager.save(Notification, notif);
     }
 
+    // ==================== GET NOTIFS USUARIO ====================
     async getNotificationsForUser(userId: number) {
-        // Lógica para obtener notificaciones del usuario con userId
-        console.log(`Obteniendo notificaciones para el usuario ${userId}`);
-        // Aquí podrías consultar una base de datos o un servicio externo
-        return [
-            { id: 1, message: "Notificación 1 para el usuario " + userId },
-            { id: 2, message: "Notificación 2 para el usuario " + userId },
-        ];
+        return AppDataSource.manager.find(Notification, {
+            where: { user: { id_user: userId } },
+            order: { date: "DESC" }
+        });
     } 
+
+
+    // ==================== MARCAR COMO VISTO ====================
+    async markAsRead(notificationId: number) {
+        const notif = await AppDataSource.manager.findOne(Notification, { where: { id_notification: notificationId } });
+        if (!notif) throw new BadRequestException('Notificación no encontrada');
+
+        notif.read = true;
+        await AppDataSource.manager.save(Notification, notif);
+        return { message: 'Notificación marcada como leída' };
+    }
 }
