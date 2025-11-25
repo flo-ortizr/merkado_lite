@@ -12,6 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  //payload - info que va dentro el token
   async validate(payload: any) {
     return {
       id_user: payload.sub,

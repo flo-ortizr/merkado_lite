@@ -8,6 +8,7 @@ import { RegisterByAdminDto } from './dto/register_by_admin.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+
   @Post('login')
   async login(@Body() body: LoginDto) {
     try {
@@ -19,6 +20,7 @@ export class AuthController {
       );
     }
   }
+
 
   @Post('register')
   async registerClient(@Body() body: RegisterClientDto) {
@@ -32,6 +34,7 @@ export class AuthController {
     }
   }
 
+  
   @Post('register/admin')
   async registerByAdmin(@Body() body: RegisterByAdminDto) {
     try {

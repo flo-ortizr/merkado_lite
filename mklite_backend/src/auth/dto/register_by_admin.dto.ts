@@ -1,6 +1,5 @@
-// src/auth/dto/register-by-admin.dto.ts
 import { IsEmail, IsString, MinLength } from 'class-validator';
-
+//Admi registra nuevos usuarios con roles específicos
 export class RegisterByAdminDto {
   @IsEmail()
   email: string;
@@ -19,5 +18,5 @@ export class RegisterByAdminDto {
   phone: string;
 
   @IsString()
-  roleName: string; // Vendedor, Repartidor, etc
+  roleName: string; // Vendedor, Repartidor, Encargado de Almacen, etc
 }
