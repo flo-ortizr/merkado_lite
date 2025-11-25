@@ -13,7 +13,7 @@ export class InventoryService {
         private readonly notificationService: NotificationService,
     ) {}
 
-  // obtener inventario completo
+  // ==================== OBTENER INVENTARIO COMPLETO ====================
   async getAllInventory() {
     return AppDataSource.manager.find(Inventory, {
       relations: ['product'],
@@ -21,7 +21,7 @@ export class InventoryService {
     });
   }
 
-  // actualizar stock
+  // ==================== ACTUALIZAR STOCK ====================
   async updateStock(dto: UpdateInventoryDto) {
     const inventory = await AppDataSource.manager.findOne(Inventory, {
       where: { product: { id_product: dto.productId } },
@@ -52,7 +52,8 @@ export class InventoryService {
     return { message: 'Inventario actualizado', inventory };
   }
 
-  // opcional: obtener stock de un producto
+
+  // ==================== OBTENER STOCK DE 1 PRODUCTO ====================
   async getStockByProduct(productId: number) {
     const inventory = await AppDataSource.manager.findOne(Inventory, {
       where: { product: { id_product: productId } },

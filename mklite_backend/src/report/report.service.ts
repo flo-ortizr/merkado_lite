@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class ReportService {
 
-  // Método principal que recibe filtros y devuelve reporte dummy
+  // Método principal que recibe filtros y devuelve reporte
   async generateReport(params: {
     startDate: string,
     endDate: string,
@@ -11,8 +11,6 @@ export class ReportService {
     metric: string
   }) {
 
-    // Aquí podrías luego hacer queries reales usando AppDataSource
-    // Por ahora, solo devolvemos un JSON de ejemplo
     //MOCK DATA
     return {
       reportTitle: 'Reporte de Desempeño',

@@ -19,7 +19,7 @@ export class PromotionService {
     return 'expired';
   }
 
-  // CREAR
+  // ==================== CREAR PROMO ====================
   async create(dto: CreatePromotionDto) {
     const products = await this.productRepo.findByIds(dto.product_ids);
 
@@ -32,7 +32,7 @@ export class PromotionService {
     return await this.promotionRepo.save(promotion);
   }
 
-  // LISTAR TODAS (actualizando estado automáticamente)
+  // ==================== VER TODAS ====================
   async findAll() {
     const list = await this.promotionRepo.find({
       relations: ['products'],
@@ -49,7 +49,7 @@ export class PromotionService {
     return list;
   }
 
-  // BUSCAR UNA
+  // ==================== VER 1 POR ID ====================
   async findOne(id: number) {
     const promo = await this.promotionRepo.findOne({
       where: { id_promotion: id },
@@ -63,7 +63,7 @@ export class PromotionService {
     return promo;
   }
 
-  // EDITAR
+  // ==================== EDITAR PROMO ====================
   async update(id: number, dto: UpdatePromotionDto) {
     const promo = await this.promotionRepo.findOne({
       where: { id_promotion: id },
@@ -89,7 +89,7 @@ export class PromotionService {
     return await this.promotionRepo.save(promo);
   }
 
-  // ELIMINAR
+  // ==================== ELIMINAR PROMO ====================
   async remove(id: number) {
     const promo = await this.promotionRepo.findOne({
       where: { id_promotion: id },

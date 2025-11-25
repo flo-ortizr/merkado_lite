@@ -1,4 +1,3 @@
-// user.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { AppDataSource } from 'src/data-source';
 import { User } from './user.entity';

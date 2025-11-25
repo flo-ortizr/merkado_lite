@@ -16,6 +16,7 @@ export class InStoreSaleService {
   constructor(
   private readonly inventoryService: InventoryService,) {}
 
+  // ==================== CREAR VENTA ====================
   async createSale(dto: CreateInStoreSaleDto) {
     // 1. validar vendedor
     const user = await AppDataSource.manager.findOne(User, { where: { id_user: dto.userId } });
@@ -65,7 +66,7 @@ export class InStoreSaleService {
     return savedSale;
   }
 
-  // listar ventas de un vendedor
+  // ==================== LISTAR VENTAS POR VENDEDOR ====================
   async getSalesByUser(userId: number) {
     const sales = await AppDataSource.manager.find(InStoreSale, {
       where: { user: { id_user: userId } },
@@ -75,6 +76,7 @@ export class InStoreSaleService {
     return sales;
   }
 
+  // ==================== CANCELAR VENTA ====================
   async cancelSale(dto: CancelSaleDto) {
 
     const sale = await AppDataSource.manager.findOne(InStoreSale, {
@@ -101,6 +103,8 @@ export class InStoreSaleService {
     return { message: 'Venta anulada y stock restaurado', sale };
   }
 
+
+  // ==================== DEVOLVER ITEM ====================
   async returnItem(dto: ReturnItemDto) {
 
     const sale = await AppDataSource.manager.findOne(InStoreSale, {

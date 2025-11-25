@@ -9,6 +9,7 @@ import { PurchaseOrderItem } from '../purchase_order_item/purchase_order_item.en
 @Injectable()
 export class PurchaseOrderService {
 
+  // ==================== CREAR ORDEN DE COMPRA ====================
   async createOrder(dto: CreatePurchaseOrderDto) {
     // Validar proveedor
     const supplier = await AppDataSource.manager.findOne(Supplier, {
@@ -16,7 +17,7 @@ export class PurchaseOrderService {
     });
     if (!supplier) throw new BadRequestException('Proveedor no encontrado');
 
-    // Crear orden de compra
+    // Crear orden 
     const order = AppDataSource.manager.create(PurchaseOrder, {
       supplier,
       order_date: new Date(),
@@ -51,6 +52,8 @@ export class PurchaseOrderService {
     };
   }
 
+
+  // ==================== VER TODAS ====================
   async getOrders() {
     return AppDataSource.manager.find(PurchaseOrder, {
       relations: ['supplier', 'items', 'items.product'],
@@ -58,6 +61,8 @@ export class PurchaseOrderService {
     });
   }
 
+
+// ==================== VER POR ID ====================
   async getOrderById(orderId: number) {
     const order = await AppDataSource.manager.findOne(PurchaseOrder, {
       where: { id_purchase_order: orderId },

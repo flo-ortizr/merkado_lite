@@ -12,6 +12,7 @@ import { OrderHistoryDto } from './dto/order_history.dto';
 @Injectable()
 export class OrderService {
 
+  // ==================== CONFIRMAR PEDIDO ====================
   async confirmOrder(customerId: number, dto: ConfirmOrderDto) {
 
     // 1. obtener carrito activo
@@ -35,7 +36,7 @@ export class OrderService {
 
     const savedOrder = await AppDataSource.manager.save(Order, order);
 
-    // 3. crear detalles (SIN descontar stock)
+    // 3. crear detalles 
     let total = 0;
 
     for (const item of cart.items) {
@@ -104,8 +105,8 @@ export class OrderService {
   }));
 }
 
-// src/order/order.service.ts
 
+// ==================== CANCELAR PEDIDO ====================
 async cancelExpiredOrders() {
   const now = new Date();
   const ONE_HOUR = 60 * 60 * 1000;
@@ -140,10 +141,6 @@ async cancelExpiredOrders() {
       // 4. Cambiar estado a cancelado
       order.status = 'cancelled';
       await AppDataSource.manager.save(order);
-
-      // 5. Registrar historial si deseas
-      // (Solo si tienes una tabla. Si no, lo dejamos comentado)
-      // await this.registerHistory(order.id_order, 'cancelled');
 
       cancelled++;
     }

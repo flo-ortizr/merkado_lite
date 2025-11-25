@@ -6,6 +6,8 @@ import { User } from "src/user/user.entity";
 
 @Injectable()
 export class NotificationService {
+    
+    // ==================== ENVIAR NOTIF ====================
     async sendNotification(message: string, userId: number) {
         const user = await AppDataSource.manager.findOne(User, { where: { id_user: userId } });
         if (!user) {
@@ -22,6 +24,7 @@ export class NotificationService {
         await AppDataSource.manager.save(Notification, notif);
     }
 
+    // ==================== GET NOTIFS USUARIO ====================
     async getNotificationsForUser(userId: number) {
         return AppDataSource.manager.find(Notification, {
             where: { user: { id_user: userId } },
@@ -29,6 +32,8 @@ export class NotificationService {
         });
     } 
 
+
+    // ==================== MARCAR COMO VISTO ====================
     async markAsRead(notificationId: number) {
         const notif = await AppDataSource.manager.findOne(Notification, { where: { id_notification: notificationId } });
         if (!notif) throw new BadRequestException('Notificación no encontrada');
