@@ -9,9 +9,7 @@ import { User } from 'src/user/user.entity';
 @Injectable()
 export class InventoryService {
 
-    constructor(
-        private readonly notificationService: NotificationService,
-    ) {}
+    constructor(private readonly notificationService: NotificationService) {}
 
   // ==================== OBTENER INVENTARIO COMPLETO ====================
   async getAllInventory() {
