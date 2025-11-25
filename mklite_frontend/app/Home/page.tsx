@@ -20,11 +20,7 @@ type ProductCardProps = {
 };
 
 type ProductShelfProps = {
-<<<<<<< HEAD
   id: string;
-=======
-  id: string; 
->>>>>>> Frontend/HU-F04.1
   title: string;
   products: Product[];
   forwardRef: React.RefObject<HTMLElement | null>; 
@@ -138,11 +134,7 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
         <div className={styles.modalContent}>
           <div className={styles.modalImage}>
              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-<<<<<<< HEAD
                <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain' }} />
-=======
-               <Image src={product.image} alt={product.nombre} fill style={{ objectFit: 'contain', padding: '20px' }} />
->>>>>>> Frontend/HU-F04.1
              </div>
           </div>
 
