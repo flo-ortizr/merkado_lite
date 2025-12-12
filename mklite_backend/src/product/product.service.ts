@@ -5,6 +5,7 @@ import { Product } from "./product.entity";
 import { Supplier } from "../supplier/supplier.entity";
 import { CreateProductDto } from "./dto/create_product.dto";
 import { UpdateProductDto } from "./dto/update_product.dto";
+import { Promotion } from "src/promotion/promotion.entity";
 
 @Injectable()
 export class ProductService {
@@ -54,6 +55,7 @@ export class ProductService {
         });
     }
 
+   
     // ==================== VER POR ID ====================
     async getProductById(id: number) {
         return await AppDataSource.manager.findOne(Product, {

@@ -21,16 +21,25 @@ export class PromotionService {
 
   // ==================== CREAR PROMO ====================
   async create(dto: CreatePromotionDto) {
-    const products = await this.productRepo.findByIds(dto.product_ids);
+  // Asegurarse de que sea array
+  const productIds = dto.product_ids || [];
 
-    const promotion = this.promotionRepo.create({
-      ...dto,
-      products,
-      status: this.getPromotionStatus(new Date(dto.start_date), new Date(dto.end_date)),
-    });
+  const products = productIds.length
+    ? await this.productRepo.findByIds(productIds)
+    : [];
 
-    return await this.promotionRepo.save(promotion);
-  }
+  const promotion = this.promotionRepo.create({
+    ...dto,
+    products,
+    status: this.getPromotionStatus(
+      new Date(dto.start_date),
+      new Date(dto.end_date)
+    ),
+  });
+
+  return await this.promotionRepo.save(promotion);
+}
+
 
   // ==================== VER TODAS ====================
   async findAll() {
