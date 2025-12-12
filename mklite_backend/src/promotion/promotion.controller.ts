@@ -1,33 +1,34 @@
-import { Controller, Get, Post, Put, Delete, Param } from "@nestjs/common";
-import { Promotion } from "src/promotion/promotion.entity";
-import { PromotionService } from "./promotion.service";
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { PromotionService } from './promotion.service';
+import { CreatePromotionDto } from './dto/create_promotion.dto';
+import { UpdatePromotionDto } from './dto/update_promotion.dto';
 
-@Controller('/promotion')
+@Controller('promotions')
 export class PromotionController {
-    constructor(private readonly promotionService: PromotionService) {}
+  constructor(private readonly promotionService: PromotionService) {}
 
-    @Get()
-    getPromotions() {
-        return this.promotionService.getPromotions();
-    }
+  @Post()
+  create(@Body() dto: CreatePromotionDto) {
+    return this.promotionService.create(dto);
+  }
 
-    @Get('/:id')
-    getPromotionById(@Param() params: any) {
-        return this.promotionService.getPromotionById(params.id);
-    }
+  @Get()
+  findAll() {
+    return this.promotionService.findAll();
+  }
 
-    @Post()
-    createPromotion(promotion: Promotion) {
-        return this.promotionService.createPromotion(promotion);
-    }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.promotionService.findOne(+id);
+  }
 
-    @Put('/:id')
-    updatePromotion(@Param() params: any, promotion: Promotion) {
-        return this.promotionService.updatePromotion(params.id, promotion);
-    }
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdatePromotionDto) {
+    return this.promotionService.update(+id, dto);
+  }
 
-    @Delete('/:id')
-    deletePromotion(@Param() params: any) {
-        return this.promotionService.deletePromotion(params.id);
-    }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.promotionService.remove(+id);
+  }
 }

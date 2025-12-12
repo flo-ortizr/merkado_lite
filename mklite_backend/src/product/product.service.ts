@@ -8,10 +8,13 @@ import { UpdateProductDto } from "./dto/update_product.dto";
 
 @Injectable()
 export class ProductService {
-    async getCatalog(){ //productos activos
+    
+    // ==================== PRODUCTOS ACTIVOS ====================
+    async getCatalog(){ 
         return await AppDataSource.manager.find(Product, {where: {status: 'active'}, relations: ['category']});
     }
     
+    // ==================== VER POR CATEGORIA ====================
     async getByCategory(categoryId: number) {
         return await AppDataSource.manager.find(Product, {
             where: {
@@ -22,6 +25,7 @@ export class ProductService {
         });
     }
 
+    // ==================== BUSQUEDA ====================
     async searchProducts(query: string) {
         return await AppDataSource.manager
             .getRepository(Product)
@@ -32,6 +36,7 @@ export class ProductService {
             .getMany();
     }
 
+    // ==================== FILTRAR POR PRECIO ====================
     async filterByPrice(min: number, max: number) {
         return await AppDataSource.manager
             .getRepository(Product)
@@ -42,12 +47,14 @@ export class ProductService {
             .getMany();
     }
 
+    // ==================== VER TODOS LOS PRODUCTOS ====================
     async getAllProducts() {
         return await AppDataSource.manager.find(Product, {
             relations: ['category']
         });
     }
 
+    // ==================== VER POR ID ====================
     async getProductById(id: number) {
         return await AppDataSource.manager.findOne(Product, {
             where: { id_product: id },
@@ -55,6 +62,7 @@ export class ProductService {
         });
     }
 
+    // ==================== CREAR PRODUCTO ====================
     async createProduct(dto: CreateProductDto){
         const category = await AppDataSource.manager.findOne(Category, {where: {id_category: dto.id_category}});
         if(!category) throw new Error('Categoria no econtrada');
@@ -76,6 +84,7 @@ export class ProductService {
         return await AppDataSource.manager.save(Product, product);
     }
 
+    // ==================== ACTUALIZAR PRODUCTO ====================
     async updateProduct(id: number, dto: UpdateProductDto){
         const product = await AppDataSource.manager.findOne(Product, {where: {id_product: id}});
         if(!product) throw new Error('Producto no encontrado');
@@ -97,6 +106,7 @@ export class ProductService {
         return await AppDataSource.manager.save(Product, product);
     }
 
+    // ==================== ELIMINAR PRODUCTO ====================
     async deleteProduct(id: number){
         const result = await AppDataSource.manager.delete(Product, {id_product: id});
 

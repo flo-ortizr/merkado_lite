@@ -40,7 +40,7 @@ const UserRoleManagement = () => {
     const handleDelete = (userId: number) => {
         setSystemMessage({
             type: 'confirm',
-            text: `¿Está seguro de que desea desactivar al usuario con ID ${userId}?`,
+            text: `¿Está seguro de que desea eliminar al usuario con ID ${userId}?`,
             onConfirm: async () => {
                 try {
                     await disableUser(userId);
@@ -186,7 +186,7 @@ const UserRoleManagement = () => {
                                             </td>
                                             <td className="px-6 py-4 text-center space-x-3">
                                                 <button onClick={() => handleEdit(user.id_user)} className={styles.actionBtnEdit}>Editar</button>
-                                                <button onClick={() => handleDelete(user.id_user)} className={styles.actionBtnDelete}>Desactivar</button>
+                                                <button onClick={() => handleDelete(user.id_user)} className={styles.actionBtnDelete}>Eliminar</button>
                                             </td>
                                         </tr>
                                     ))}

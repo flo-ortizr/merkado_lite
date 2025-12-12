@@ -1,8 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { Customer } from '../customer/customer.entity';
 import { OrderDetail } from '../order_detail/order_detail.entity';
-import { Delivery } from '../delivery/delivery.entity';
-import { Return } from '../return/return.entity';  
+import { Delivery } from '../delivery/delivery.entity';  
 
 @Entity('order')
 export class Order {
@@ -30,7 +29,4 @@ export class Order {
 
   @OneToOne(() => Delivery, (delivery) => delivery.order)
   delivery: Delivery;
-
-  @OneToMany(() => Return, (ret) => ret.order)
-  returns: Return[];
 }

@@ -24,7 +24,7 @@ export class UserService {
       ...userData,
       password: hashedPassword,
       role,
-      status: "active" // ← como en tu ejemplo real
+      status: "active" 
     });
 
     return await AppDataSource.manager.save(User, user);
@@ -50,16 +50,17 @@ export class UserService {
     });
   }
 
-  // DISABLE USER (NO DELETE)
-  async deleteUser(id: number) {
-    const user = await AppDataSource.manager.findOneBy(User, { id_user: id });
 
-    if (!user) throw new BadRequestException("Usuario no encontrado");
+async deleteUser(id: number) {
+  // Buscar el usuario
+  const user = await AppDataSource.manager.findOneBy(User, { id_user: id });
 
-    user.status = "inactive"; // ← coincide con tu BD
+  if (!user) throw new BadRequestException("Usuario no encontrado");
 
-    return await AppDataSource.manager.save(User, user);
-  }
+  // Eliminar el usuario de la base de datos
+  return await AppDataSource.manager.remove(User, user);
+}
+
 
   // FIND EMAIL
   async findByEmail(email: string) {

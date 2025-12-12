@@ -1,33 +1,24 @@
-import { Controller, Get, Post, Delete, Put, Param } from "@nestjs/common";
-import { PurchaseOrder } from "./purchase_order.entity";
-import { PurchaseOrderService } from "./purchase_order.service";
+import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { PurchaseOrderService } from './purchase_order.service';
+import { CreatePurchaseOrderDto } from './dto/create_purchase_order.dto';
 
-@Controller('/purchaseorder')
+@Controller('/purchase-order')
 export class PurchaseOrderController {
-    constructor(private readonly purchaseOrderService: PurchaseOrderService) {}
+  constructor(private readonly poService: PurchaseOrderService) {}
 
-    @Post()
-    createPurchaseOrder(purchaseorder : PurchaseOrder) {
-        this.purchaseOrderService.createPurchaseOrder(purchaseorder);
-    }
-    
-    @Get()
-    getAllPurchaseOrders(){
-        return this.purchaseOrderService.getAllPurchaseOrders();
-    }
+  @Post()
+  async createOrder(@Body() dto: CreatePurchaseOrderDto) {
+    return this.poService.createOrder(dto
+  );
+  }
+  
+  @Get()
+  async getOrders() {
+    return this.poService.getOrders();
+  }
 
-    @Get('/:id')
-    getPurchaseOrderById(@Param() params : any){
-        return this.purchaseOrderService.getPurchaseOrderById(params.id);
-    }
-    
-    @Delete('/:id')
-    deletePurchaseOrder(@Param() params : any){
-        return this.purchaseOrderService.DeletePurchaseOrder(params.id);
-    }
-
-    @Put('/:id')
-    updatePurchaseOrder(@Param() params : any, purchaseorder : PurchaseOrder){
-        return this.purchaseOrderService.UpdatePurchaseOrder(params.id, purchaseorder);
-    }
+  @Get('/:id')
+  async getOrderById(@Param('id') id: number) {
+    return this.poService.getOrderById(id);
+  }
 }

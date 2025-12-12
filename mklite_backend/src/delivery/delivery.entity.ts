@@ -15,12 +15,12 @@ export class Delivery {
   @JoinColumn({ name: 'id_driver' })
   driver: User;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'datetime', nullable: true })
   scheduled_date: Date;
 
   @Column({ type: 'datetime', nullable: true })
   delivered_date: Date;
 
-  @Column({ type: 'enum', enum: ['scheduled', 'delivered', 'not_picked_up'], default: 'scheduled' })
+  @Column({ type: 'enum', enum: ['pending', 'delivered', 'cancelled', 'on_way'], default: 'pending' })
   status: string;
 }

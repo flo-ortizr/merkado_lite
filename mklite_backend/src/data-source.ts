@@ -12,13 +12,13 @@ import { InStoreSaleDetail } from "./instore_sale_detail/instore_sale_detail.ent
 import { PurchaseOrder } from "./purchase_order/purchase_order.entity"
 import { Customer } from "./customer/customer.entity"
 import { AuditLog } from "./audit_log/audit_log.entity"
-import { Return } from "./return/return.entity"
 import { Promotion } from "./promotion/promotion.entity"
 import { PriceHistory } from "./price_history/price_history.entity"
 import { Delivery } from "./delivery/delivery.entity"
 import {Notification} from "./notification/notification.entity"
 import { Cart } from "./cart/cart.entity"
 import { CartItem } from "./cart_item/cart_item.entity"
+import { PurchaseOrderItem } from "./purchase_order_item/purchase_order_item.entity"
 
 export const AppDataSource = new DataSource({
     type: "mysql",
@@ -30,7 +30,7 @@ export const AppDataSource = new DataSource({
     synchronize: true,
     logging: true,
     entities: [Role, User, Product, Category, Order, OrderDetail, Supplier, Inventory, InStoreSale, InStoreSaleDetail, 
-        PurchaseOrder, Customer, AuditLog, Notification, Return, Promotion, PriceHistory, Delivery, Cart, CartItem],
+        PurchaseOrder, PurchaseOrderItem, Customer, AuditLog, Notification, Promotion, PriceHistory, Delivery, Cart, CartItem],
     subscribers: [],
     migrations: [],
 })

@@ -12,7 +12,7 @@ import { RegisterByAdminDto } from './dto/register_by_admin.dto';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  /** LOGIN */
+  // ==================== LOGIN ====================
   async login(email: string, password: string) {
     const user = await AppDataSource.manager.findOne(User, {
       where: { email },
@@ -37,7 +37,8 @@ export class AuthService {
     };
   }
 
-  /** Registro normal — siempre Cliente */
+
+  // ==================== REGISTRO CLIENTE ====================
   async registerClient(data: RegisterClientDto) {
     const exists = await AppDataSource.manager.findOne(User, { where: { email: data.email } });
     if (exists) throw new BadRequestException('El email ya existe');
@@ -50,14 +51,15 @@ export class AuthService {
     const user = AppDataSource.manager.create(User, { ...data, password, role: clientRole });
     const savedUser = await AppDataSource.manager.save(User, user);
 
-    // Crear Customer automáticamente
+    // Crea Customer automáticamente
     const customer = AppDataSource.manager.create(Customer, { user: savedUser });
     await AppDataSource.manager.save(Customer, customer);
 
     return savedUser;
   }
 
-  /** Registro especial — solo Admin puede crear otros roles */
+  
+  // ==================== REGISTRO POR ADMI PARA ROLES ESPECIFICOS ====================
   async registerByAdmin(data: RegisterByAdminDto) {
     const exists = await AppDataSource.manager.findOne(User, { where: { email: data.email } });
     if (exists) throw new BadRequestException('El email ya existe');
