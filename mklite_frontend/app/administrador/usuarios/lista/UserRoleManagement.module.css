@@ -1,0 +1,225 @@
+/* Contenedor principal */
+.container {
+    min-height: 100vh;
+    padding: 1.5rem;
+    background-color: #1f2937; /* gray-900 */
+    color: #f9fafb; /* text-gray-100 */
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Tarjeta principal */
+.card {
+    width: 100%;
+    max-width: 72rem; /* max-w-6xl */
+    background-color: #1f2937; /* gray-800 */
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    padding: 2rem;
+}
+
+/* Header */
+.header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #374151; /* gray-700 */
+    padding-bottom: 1rem;
+}
+
+/* Título */
+.title {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 800;
+    color: #dc2626; /* red-600 */
+    display: flex;
+    align-items: center;
+}
+
+/* Botón crear */
+.createBtn {
+    background-color: #16a34a; /* green-600 */
+    color: white;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.createBtn:hover {
+    background-color: #15803d; /* green-700 */
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+/* Mensajes */
+.messageSuccess {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: white;
+    background-color: #16a34a;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.messageInfo {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: white;
+    background-color: #4f46e5; /* indigo-600 */
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: opacity 0.3s;
+}
+
+.messageConfirm {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    background-color: #991b1b; /* red-800 */
+    border-radius: 0.5rem;
+    font-weight: 600;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.confirmBtn {
+    background-color: white;
+    color: #991b1b;
+    padding: 0.25rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.confirmBtn:hover {
+    background-color: #e5e7eb; /* gray-200 */
+}
+
+.cancelBtn {
+    background-color: #4b5563; /* gray-600 */
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.cancelBtn:hover {
+    background-color: #6b7280; /* gray-500 */
+}
+
+/* Tabla */
+.tableWrapper {
+    background-color: #1f2937;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+}
+
+.tableContainer {
+    overflow-x: auto;
+}
+
+.table {
+    min-width: 100%;
+    table-layout: auto;
+    font-size: 0.875rem;
+    text-align: left;
+    color: #e5e7eb;
+}
+
+.thead {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #9ca3af;
+    background-color: #374151;
+}
+
+.trHover {
+    border-bottom: 1px solid #374151;
+}
+
+.trHover:hover {
+    background-color: rgba(55,65,81,0.3);
+}
+
+.tdId {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: #f87171;
+}
+
+.tdName {
+    padding: 1rem 1.5rem;
+}
+
+.tdEmail {
+    padding: 1rem 1.5rem;
+    font-style: italic;
+    color: #9ca3af;
+}
+
+.tdRole {
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    color: white;
+}
+
+.tdStatus {
+    padding: 1rem 1.5rem;
+    text-align: center;
+}
+
+.statusActive {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background-color: #16a34a;
+    color: white;
+}
+
+.statusInactive {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    background-color: #ca8a04;
+    color: white;
+}
+
+/* Botones de acción */
+.actionBtnEdit {
+    background-color: #4f46e5;
+    color: white;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s;
+}
+
+.actionBtnEdit:hover {
+    background-color: #4338ca;
+}
+
+.actionBtnDelete {
+    background-color: #4b5563;
+    color: white;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s;
+}
+
+.actionBtnDelete:hover {
+    background-color: #b91c1c;
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-
+import { useRouter } from 'next/navigation';
 // =================================================================
 // 1. CONSTANTES Y DATOS MOCKEADOS (Simulando inventario)
 // =================================================================
@@ -36,10 +36,12 @@ const App = () => {
     const [message, setMessage] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-
+const router = useRouter();
     const userId = "Juan Pérez"; // Vendedor mockeado
 
-
+const goToReturns = () => {
+        router.push('/vendedor/devoluciones'); // <-- Cambia la ruta si es otra
+    };
     // -----------------------------------------------------------------
     // A. CÁLCULO Y MONEDA (Bolivianos)
     // -----------------------------------------------------------------
@@ -208,10 +210,13 @@ const App = () => {
         );
     }, [products, searchTerm]);
 
-
+const handleLogout = () => {
+        
+        router.push('/'); 
+    };
     return (
         <div className="min-h-screen h-screen bg-gray-900 text-gray-100 font-sans flex flex-col lg:flex-row overflow-hidden">
-            
+
             {/* Oculta las flechas del input number */}
             <style jsx global>{`
                 .hide-number-arrows::-webkit-outer-spin-button,
@@ -226,6 +231,7 @@ const App = () => {
             
             {/* 1. Columna Izquierda: Productos (Scrollable) */}
             <div className="lg:w-2/5 p-4 bg-gray-800 shadow-xl flex flex-col h-full">
+           
                 <header className="mb-4 flex justify-between items-center flex-shrink-0">
                     <h1 className="text-xl font-bold text-red-500">Registro de Venta Presencial</h1>
                     <div className="text-sm text-gray-400">
@@ -290,6 +296,21 @@ const App = () => {
 
             {/* 2. Columna Central: Carrito y Resumen (Contenedor flex para fijar el resumen) */}
             <div className="lg:w-2/5 p-4 bg-gray-900 flex flex-col h-full">
+             <button 
+                onClick={handleLogout} 
+                style={{
+                   
+                    
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                }}
+            >
+                Cerrar Sesión
+            </button>
                 <h2 className="text-xl font-bold mb-4 text-red-500 border-b border-gray-700 pb-2 flex-shrink-0">Lista de Artículos de la Venta</h2>
                 
                 {/* Encabezados de tabla para el carrito (Fijos) */}
@@ -390,6 +411,12 @@ const App = () => {
 
             {/* 3. Columna Derecha: Métodos de Pago y Finalización (Contenedor flex para fijar el botón de venta) */}
             <div className="lg:w-1/5 p-4 bg-gray-800 flex flex-col h-full">
+            <button
+    onClick={goToReturns}
+    className="px-3 py-1 bg-yellow-500 text-gray-900 font-bold rounded hover:bg-yellow-600 transition text-sm"
+>
+    IR A DEVOLUCIONES
+</button>
                 <h2 className="text-xl font-bold mb-4 text-red-500 border-b border-gray-700 pb-2 flex-shrink-0">Opciones de Pago</h2>
                 
                 {/* Selector de Método de Pago */}

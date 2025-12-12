@@ -1,24 +1,42 @@
-import {Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { User } from 'src/user/user.entity';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { UserService } from './user.service';
+import { User } from './user.entity';
 
 @Controller('/user')
 export class UserController {
-    
-    constructor(private readonly userService: UserService) {}
-    
-    @Get()
-    getAllUsers(){
-        return this.userService.getAllUsers();
-    }
 
-    @Get('/:id')
-    getUserById(@Param() params : any){
-        return this.userService.getUserById(params.id);
-    }
+  constructor(private readonly userService: UserService) {}
 
-    @Delete('/:id')
-    deleteUser(@Param() params : any){
-        return this.userService.DeleteUser(params.id);
-    }
+  // CREATE USER
+  @Post()
+  createUser(@Body() userData: Partial<User> & { roleId?: number }) {
+    return this.userService.createUser(userData);
+  }
+
+  // LISTAR USUARIOS (excepto Cliente)
+  @Get()
+  getAllUsers() {
+    return this.userService.getAllUsers();
+  }
+
+  // GET BY ID
+  @Get('/:id')
+getUserById(@Param('id', ParseIntPipe) id: number) {
+  return this.userService.getUserById(id);
+}
+
+  // UPDATE USER
+  @Put('/:id')
+  updateUser(
+    @Param('id') id: number,
+    @Body() userData: Partial<User>,
+  ) {
+    return this.userService.updateUser(id, userData);
+  }
+
+  // DISABLE USER
+  @Delete('/:id')
+  disableUser(@Param('id') id: number) {
+    return this.userService.deleteUser(id);
+  }
 }

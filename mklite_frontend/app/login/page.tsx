@@ -33,10 +33,10 @@ export default function LoginPage() {
 
       // Guardar token y rol en localStorage
       localStorage.setItem("token", response.token);
-      localStorage.setItem("role", response.user.role?.name || "Cliente");
+      localStorage.setItem("role", response.user.role || "Cliente");
 
       // Redirigir según rol
-      const roleName = response.user.role?.name;
+      const roleName = response.user.role;
       switch (roleName) {
         case "Administrador":
           router.push("/administrador/usuarios/lista");

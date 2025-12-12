@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { loginUser } from "./login/loginService"
-import LoginModel from "./login/login.model"
-import { User } from "./models/User"
-import styles from "./login/LoginPage.module.css"
+import { loginUser } from "./login/loginService";
+import LoginModel from "./login/login.model";
+import { User } from "./models/User";
+import styles from "./login/LoginPage.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,48 +15,74 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    console.log("handleLogin ejecutado"); // log de depuración
-    setError("");
+  const handleLogin = async (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    
 
+    setError("");
     if (!email || !password) {
+      
       setError("Por favor ingresa email y contraseña");
       return;
     }
 
     setLoading(true);
+   
 
     try {
       const data: LoginModel = { email, password };
+     
+
       const response: { token: string; user: User } = await loginUser(data);
+      
+
+      if (!response?.user) {
+       
+        setError("Usuario o contraseña incorrectos");
+        return;
+      }
+
       localStorage.setItem("token", response.token);
-      localStorage.setItem("role", response.user.role?.name || "Cliente");
-      const roleName = response.user.role?.name;
+      localStorage.setItem("role", response.user.role || "Cliente");
+      
+
+      const roleName = response.user?.role
+
       switch (roleName) {
         case "Administrador":
-          router.push("/administrador/usuarios/lista");
+          console.log("Redirigiendo a /administrador/usuarios/lista");
+          await router.push("/administrador/usuarios/lista");
           break;
         case "Vendedor":
-          router.push("/vendedor/ventas-presenciales");
+          console.log("Redirigiendo a /vendedor/ventas-presenciales");
+          await router.push("/vendedor/ventas-presenciales");
           break;
         case "Encargado de Almacén":
-          router.push("/almacen/inventario");
+          console.log("Redirigiendo a /almacen/inventario");
+          await router.push("/almacen/inventario");
           break;
         case "Repartidor":
-          router.push("/repartidor");
+          console.log("Redirigiendo a /repartidor");
+          await router.push("/repartidor");
           break;
         case "Soporte":
-          router.push("/SoporteHome");
+          console.log("Redirigiendo a /SoporteHome");
+          await router.push("/SoporteHome");
           break;
         default:
-          router.push("/Home");
+          console.log("Redirigiendo a /Home por defecto");
+          await router.push("/Home");
           break;
       }
+
+      console.log("Redirección completada (si no hubo errores)");
+
     } catch (err: any) {
       console.error("Error login:", err);
-      setError(err.message || "Credenciales incorrectas");
+      setError(err.message || "Error al iniciar sesión");
     } finally {
       setLoading(false);
+      console.log("Login finalizado");
     }
   };
 
@@ -68,13 +94,7 @@ export default function LoginPage() {
             Login
           </h1>
 
-          {/* Quitamos onSubmit para evitar recarga y problemas de submit */}
-          <form className="space-y-6" onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleLogin();
-            }
-          }}>
+          <form className="space-y-6" onSubmit={handleLogin}>
             <input
               type="email"
               placeholder="Correo electrónico"
@@ -92,12 +112,7 @@ export default function LoginPage() {
 
             {error && <p className={styles.error}>{error}</p>}
 
-            <button
-              type="button"
-              onClick={handleLogin}
-              className={styles.button}
-              disabled={loading}
-            >
+            <button type="submit" className={styles.button} disabled={loading}>
               {loading ? "Iniciando..." : "Iniciar sesión"}
             </button>
           </form>
@@ -117,8 +132,8 @@ export default function LoginPage() {
         <Image
           src="/Imagines/Logo.jpg"
           alt="Logo de la app"
-          width={550}
-          height={550}
+          width={950}
+          height={950}
           className="object-contain drop-shadow-2xl"
         />
       </div>

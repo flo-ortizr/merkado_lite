@@ -27,6 +27,7 @@ export class ProductController {
         return this.productService.filterByPrice(min, max);
     }
 
+
     @Get()
     getAllProducts() {
         return this.productService.getAllProducts();

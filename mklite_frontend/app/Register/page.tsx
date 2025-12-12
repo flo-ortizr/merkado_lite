@@ -124,8 +124,8 @@ export default function RegisterPage() {
         <Image
           src="/Imagines/Logo.jpg"
           alt="Logo de registro"
-          width={550}
-          height={550}
+          width={950}
+          height={950}
           className="object-contain drop-shadow-2xl"
         />
       </div>

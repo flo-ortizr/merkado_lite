@@ -1,186 +1,198 @@
 'use client';
-import React, { useState, useMemo } from 'react';
 
-// =================================================================
-// 1. CONSTANTES Y DATOS PRINCIPALES
-// =================================================================
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import styles from './UserRoleManagement.module.css';
+import { getUsers, disableUser } from "@/services/userService";
 
-const ROLES = [
-    { id: 'ADMIN', name: 'Administrador' },
-    { id: 'VENTAS', name: 'Vendedor (Ventas Físicas)' },
-    { id: 'ALMACEN', name: 'Encargado de Almacén' },
-    { id: 'REPARTIDOR', name: 'Repartidor' },
-    { id: 'SOPORTE', name: 'Soporte Técnico/Cliente' },
+const MENU_OPTIONS = [
+  { label: 'Ventas', path: '/administrador/ventas' },
+  { label: 'Usuarios', path: '/administrador/usuarios/lista' },
+  { label: 'Proveedores', path: '/administrador/proveedores' },
+  { label: 'Promociones', path: '/administrador/promociones' },
+  { label: 'Pedidos', path: '/administrador/pedidos' },
+  { label: 'Ofertas', path: '/administrador/ofertas' },
+  { label: 'Historial Precios', path: '/administrador/historial-precios' },
 ];
-
-// Datos Mockeados iniciales (Solo para la tabla)
-const MOCK_USERS_DB = [
-    { id: 1, name: 'Ana Gómez', email: 'ana.gomez@empresa.cl', roleId: 'ADMIN', status: 'Activo' },
-    { id: 2, name: 'Carlos Ruiz', email: 'carlos.ruiz@empresa.cl', roleId: 'ALMACEN', status: 'Activo' },
-    { id: 3, name: 'Elena Torres', email: 'elena.torres@empresa.cl', roleId: 'VENTAS', status: 'Activo' },
-    { id: 4, name: 'Luis Fernández', email: 'luis.fernandez@empresa.cl', roleId: 'REPARTIDOR', status: 'Activo' },
-    { id: 5, name: 'María Soto', email: 'maria.soto@empresa.cl', roleId: 'SOPORTE', status: 'Inactivo' },
-];
-
-// =================================================================
-// 2. COMPONENTE PRINCIPAL: UserRoleManagement
-// =================================================================
 
 const UserRoleManagement = () => {
-    const [users, setUsers] = useState(MOCK_USERS_DB);
-    const [systemMessage, setSystemMessage] = useState(null);
+    const router = useRouter(); 
+    const [users, setUsers] = useState<any[]>([]);
+    const [systemMessage, setSystemMessage] = useState<any>(null);
+    const [activePath, setActivePath] = useState<string>(router.pathname);
 
-    // Mapear Roles para visualización rápida
-    const roleMap = useMemo(() => ROLES.reduce((map, role) => ({ ...map, [role.id]: role.name }), {}), []);
-    
-    // --- Handlers de Navegación y Acciones ---
-
-    // Simula la navegación a una nueva ruta/pantalla
-    const navigate = (path) => {
-        // En un entorno real (React Router, Next.js, etc.), esto sería router.push(path)
-        console.log(`Navegando a: ${path}`);
-        setSystemMessage({ 
-            type: 'info', 
-            text: `Simulación: Redireccionando a la pantalla ${path}`, 
-            duration: 4000 
-        });
+    const loadUsers = async () => {
+        try {
+            const data = await getUsers();
+            setUsers(data);
+        } catch (err) {
+            setSystemMessage({ type: 'info', text: 'Error cargando usuarios.', duration: 3000 });
+        }
     };
 
-    const handleCreateNew = () => {
-        navigate('/crear-usuario');
-    };
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
-    const handleEdit = (userId) => {
-        navigate(`/editar-usuario/${userId}`);
-    };
+    const handleCreateNew = () => router.push('/administrador/usuarios/crear-usuario');
+    const handleEdit = (userId: number) => router.push(`/administrador/usuarios/editar-usuario/${userId}`);
 
-    const handleDelete = (userId) => {
-        // Mantenemos la lógica de eliminación para la demostración
-        setSystemMessage({ 
-            type: 'confirm', 
-            text: `¿Está seguro de que desea eliminar al usuario con ID ${userId}? Esta acción no es reversible.`,
-            onConfirm: () => {
-                const userName = users.find(u => u.id === userId)?.name || 'usuario';
-                setUsers(users.filter(u => u.id !== userId));
-                setSystemMessage({ type: 'success', text: `Usuario "${userName}" eliminado correctamente.`, duration: 3000 });
+    const handleDelete = (userId: number) => {
+        setSystemMessage({
+            type: 'confirm',
+            text: `¿Está seguro de que desea eliminar al usuario con ID ${userId}?`,
+            onConfirm: async () => {
+                try {
+                    await disableUser(userId);
+                    await loadUsers();
+                    setSystemMessage({
+                        type: 'success',
+                        text: `Usuario desactivado correctamente.`,
+                        duration: 3000
+                    });
+                } catch (error) {
+                    setSystemMessage({
+                        type: 'info',
+                        text: `Error desactivando usuario.`,
+                        duration: 3000
+                    });
+                }
             },
             onCancel: () => setSystemMessage(null)
         });
     };
-    
-    // Función para manejar el cierre automático de mensajes de éxito
-    React.useEffect(() => {
+
+    const handleLogout = () => {
+        router.push('/'); // Redirige al inicio
+    };
+
+    const goTo = (path: string) => {
+        setActivePath(path);
+        router.push(path);
+    };
+
+    useEffect(() => {
         if (systemMessage && (systemMessage.type === 'success' || systemMessage.type === 'info') && systemMessage.duration) {
-            const timer = setTimeout(() => {
-                setSystemMessage(null);
-            }, systemMessage.duration);
+            const timer = setTimeout(() => setSystemMessage(null), systemMessage.duration);
             return () => clearTimeout(timer);
         }
     }, [systemMessage]);
 
-    // --- Renderizado de la Interfaz ---
-
     return (
-        <div className="min-h-screen p-6 bg-gray-900 text-gray-100 font-sans flex justify-center items-start">
-            <div className="w-full max-w-6xl bg-gray-800 rounded-xl shadow-2xl p-8">
-                
-                {/* Header Principal */}
-                <header className="mb-8 flex justify-between items-center border-b border-gray-700 pb-4">
-                    <h1 className="text-3xl font-extrabold text-red-600 flex items-center">
-                        <svg className="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
-                        Gestión de Usuarios y Roles
-                    </h1>
-                    <button
-                        onClick={handleCreateNew}
-                        // Botón de Crear que dirige a '/crear-usuario'
-                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center transition duration-300 shadow-md hover:shadow-lg"
+        <div style={{ display: 'flex', position: 'relative' }}>
+            
+            {/* Menú lateral */}
+            <nav style={{
+                width: '220px',
+                backgroundColor: '#1F2937',
+                minHeight: '100vh',
+                padding: '20px',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+            }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Menú</h2>
+                {MENU_OPTIONS.map(option => (
+                    <button 
+                        key={option.path}
+                        onClick={() => goTo(option.path)}
+                        style={{
+                            padding: '10px 15px',
+                            backgroundColor: activePath === option.path ? '#4B5563' : '#374151',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            color: '#fff',
+                            textAlign: 'left',
+                            transition: 'background-color 0.2s',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4B5563')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = activePath === option.path ? '#4B5563' : '#374151')}
                     >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        Crear Nuevo Usuario
+                        {option.label}
                     </button>
-                </header>
+                ))}
+            </nav>
 
-                {/* Mensajes del Sistema (Éxito / Confirmación / Info) */}
-                {(systemMessage && systemMessage.type === 'success') && (
-                    <div className="p-3 mb-4 text-center text-white bg-green-600 rounded-lg font-semibold transition-opacity duration-300">
-                        {systemMessage.text}
-                    </div>
-                )}
-                {(systemMessage && systemMessage.type === 'info') && (
-                    <div className="p-3 mb-4 text-center text-white bg-indigo-600 rounded-lg font-semibold transition-opacity duration-300">
-                        {systemMessage.text}
-                    </div>
-                )}
-                {systemMessage && systemMessage.type === 'confirm' && (
-                    <div className="p-3 mb-4 flex justify-between items-center text-white bg-red-800 rounded-lg font-semibold shadow-lg">
-                        <span>{systemMessage.text}</span>
-                        <div className="space-x-3">
-                            <button 
-                                onClick={systemMessage.onConfirm}
-                                className="bg-white text-red-800 hover:bg-gray-200 px-4 py-1 rounded-lg font-bold transition"
-                            >
-                                Confirmar
-                            </button>
-                            <button 
-                                onClick={systemMessage.onCancel}
-                                className="bg-gray-600 text-white hover:bg-gray-500 px-4 py-1 rounded-lg transition"
-                            >
-                                Cancelar
-                            </button>
+            {/* Contenedor principal */}
+            <div className={styles.container} style={{ flex: 1, position: 'relative', padding: '20px' }}>
+                
+                <button 
+                    onClick={handleLogout} 
+                    style={{
+                        position: 'absolute',
+                        top: '20px',
+                        right: '20px',
+                        background: 'none',
+                        border: 'none',
+                        color: '#eef0f5ff',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                    }}
+                >
+                    Cerrar Sesión
+                </button>
+
+                <div className={styles.card}>
+                    <header className={styles.header}>
+                        <h1 className={styles.title}>Gestión de Usuarios y Roles</h1>
+                        <button onClick={handleCreateNew} className={styles.createBtn}>Crear Nuevo Usuario</button>
+                    </header>
+
+                    {systemMessage && systemMessage.type === 'success' && (
+                        <div className={styles.messageSuccess}>{systemMessage.text}</div>
+                    )}
+                    {systemMessage && systemMessage.type === 'info' && (
+                        <div className={styles.messageInfo}>{systemMessage.text}</div>
+                    )}
+                    {systemMessage && systemMessage.type === 'confirm' && (
+                        <div className={styles.messageConfirm}>
+                            <span>{systemMessage.text}</span>
+                            <div className="space-x-3">
+                                <button onClick={systemMessage.onConfirm} className={styles.confirmBtn}>Confirmar</button>
+                                <button onClick={systemMessage.onCancel} className={styles.cancelBtn}>Cancelar</button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-
-                {/* Tabla de Usuarios */}
-                <div className="bg-gray-900 rounded-lg overflow-hidden shadow-xl">
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full table-auto text-sm text-left text-gray-200">
-                            <thead className="text-xs text-gray-400 uppercase bg-gray-700">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3">ID</th>
-                                    <th scope="col" className="px-6 py-3">Nombre</th>
-                                    <th scope="col" className="px-6 py-3">Email</th>
-                                    <th scope="col" className="px-6 py-3">Rol</th>
-                                    <th scope="col" className="px-6 py-3 text-center">Estado</th>
-                                    <th scope="col" className="px-6 py-3 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.map(user => (
-                                    <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700/50">
-                                        <td className="px-6 py-4 font-semibold text-red-300">{user.id}</td>
-                                        <td className="px-6 py-4">{user.name}</td>
-                                        <td className="px-6 py-4 italic text-gray-400">{user.email}</td>
-                                        <td className="px-6 py-4 font-medium text-white">{roleMap[user.roleId] || 'Sin Rol'}</td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                                                user.status === 'Activo' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
-                                            }`}>
-                                                {user.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-center space-x-3">
-                                            <button
-                                                onClick={() => handleEdit(user.id)}
-                                                // Botón de Editar que dirige a '/editar-usuario/ID'
-                                                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1 px-3 rounded-lg transition duration-150 shadow-md"
-                                                title={`Editar Usuario ${user.name}`}
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user.id)}
-                                                className="bg-gray-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg transition duration-150"
-                                                title="Eliminar Usuario"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </td>
+                    <div className={styles.tableWrapper}>
+                        <div className={styles.tableContainer}>
+                            <table className={styles.table}>
+                                <thead className={styles.thead}>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Rol</th>
+                                        <th className="text-center">Estado</th>
+                                        <th className="text-center">Acciones</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {users.map((user) => (
+                                        <tr key={user.id_user} className={styles.trHover}>
+                                            <td>{user.name}</td>
+                                            <td>{user.email}</td>
+                                            <td>{user.role?.name || 'Sin Rol'}</td>
+                                            <td>
+                                                <span className={
+                                                    user.status === 'active'
+                                                        ? styles.statusActive
+                                                        : styles.statusInactive
+                                                }>
+                                                    {user.status === 'active' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center space-x-3">
+                                                <button onClick={() => handleEdit(user.id_user)} className={styles.actionBtnEdit}>Editar</button>
+                                                <button onClick={() => handleDelete(user.id_user)} className={styles.actionBtnDelete}>Eliminar</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
