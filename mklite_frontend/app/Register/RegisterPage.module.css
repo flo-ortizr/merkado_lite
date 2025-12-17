@@ -90,3 +90,45 @@
   border-radius: 1rem;
   text-align: center;
 }
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.buttonGroup button {
+  flex: 1;
+  padding: 0.9rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.6rem;
+  transition: all 0.25s ease;
+}
+
+/* Botón Registrar (ya lo tienes, solo mejora leve) */
+.button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Botón Cancelar */
+.cancelButton {
+  background-color: transparent;
+  color: #dc2626;
+  border: 2px solid #dc2626;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background-color: #dc2626;
+  color: white;
+  transform: translateY(-1px);
+}

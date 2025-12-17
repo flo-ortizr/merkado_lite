@@ -328,6 +328,22 @@ const [searchTerm, setSearchTerm] = useState('');
 
   const handleKeepShopping = () => setIsConfirmationOpen(false);
   const handleGoToCart = () => { setIsConfirmationOpen(false); router.push('/carrito'); };
+  const handleGoToHistory = () => {
+  setIsConfirmationOpen(false);
+  router.push('/pedidos');
+};
+const handleLogout = () => {
+  setIsConfirmationOpen(false);
+
+  // Limpia datos de sesión si usas localStorage
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('mklite_cart');
+
+  router.push('/');
+};
+
+
 const filteredProductsByCategory = Object.fromEntries(
   Object.entries(productsByCategory).map(([category, products]) => [
     category,
@@ -354,7 +370,28 @@ const filteredProductsByCategory = Object.fromEntries(
 
           
           <div className={styles.userNav}>
-           
+
+           <div
+  className={styles.historyContainer}
+  onClick={handleGoToHistory}
+>
+  <svg
+    className={styles.headerHistoryIcon}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M3 3v5h5" />
+    <path d="M3.05 13a9 9 0 1 0 .92-4" />
+    <path d="M12 7v5l3 3" />
+  </svg>
+
+  <span style={{ marginLeft: '8px' }}>Historial</span>
+</div>
+
             <div className={styles.cartContainer} onClick={handleGoToCart}>
               <svg className={styles.headerCartIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
@@ -364,6 +401,27 @@ const filteredProductsByCategory = Object.fromEntries(
               {cartCount > 0 && <span className={styles.cartBadge}>{cartCount}</span>}
               <span style={{ marginLeft: '8px' }}>Carrito</span>
             </div>
+            <div
+  className={styles.logoutContainer}
+  onClick={handleLogout}
+>
+  <svg
+    className={styles.headerLogoutIcon}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+
+  <span style={{ marginLeft: '8px' }}>Cerrar sesión</span>
+</div>
+
           </div>
         </div>
       </header>

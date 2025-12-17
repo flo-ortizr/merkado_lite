@@ -67,7 +67,7 @@ export default function PedidosPage() {
       <div className="pedidosContent">
         {/* Header */}
         <div className="pedidosHeader">
-          <Link href="/" className="backLink">
+          <Link href="/Home" className="backLink">
             ← Volver al inicio
           </Link>
           <h1 className="title">Mi Historial de Pedidos</h1>

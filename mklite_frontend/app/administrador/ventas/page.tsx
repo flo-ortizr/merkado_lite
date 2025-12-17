@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-
-// --- Datos de Simulación para las Tablas y el Histograma ---
+import * as XLSX from "xlsx"; 
+import { saveAs } from "file-saver";
+import { useRouter } from "next/navigation";
 
 // Definición de datos detallados por periodo
 const SIMULATION_DATA = {
@@ -193,7 +194,7 @@ const ReportesDeVentas = () => {
     const [fechaFin, setFechaFin] = useState('2025-01-31');
     const [periodo, setPeriodo] = useState('mensual'); // 'diario', 'semanal', 'mensual'
     const [metrica, setMetrica] = useState('venta'); // 'venta' o 'transacciones'
-
+const router = useRouter();
     // --- Estado de Datos del Reporte ---
     const [reporteTitulo, setReporteTitulo] = useState('Resultados (Mensual) - Enero 2025');
     const [metricas, setMetricas] = useState({
@@ -205,7 +206,7 @@ const ReportesDeVentas = () => {
     // Se inicializa la tabla de detalle y el histograma con datos mensuales por defecto
     const [detalleData, setDetalleData] = useState(SIMULATION_DATA.mensual.detalle);
     const [currentHistogramTitle, setCurrentHistogramTitle] = useState(SIMULATION_DATA.mensual.title);
-    
+    const exportToExcel = () => { if (!detalleData || detalleData.length === 0) return; const dataForExcel = detalleData.map((item) => ({ Periodo: item.periodo, Venta_Bs: item.venta, Crecimiento_Venta: item.crecimientoVenta, Transacciones: item.transacciones, Crecimiento_Transacciones: item.crecimientoTransacciones, })); const worksheet = XLSX.utils.json_to_sheet(dataForExcel); const workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Detalle"); const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" }); const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", }); saveAs(blob, `Reporte_Ventas_${periodo}_${fechaInicio}_a_${fechaFin}.xlsx`); };
     // --- Estado de UI y Control ---
     const [isReportVisible, setIsReportVisible] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -323,6 +324,26 @@ const ReportesDeVentas = () => {
                     <p className="text-gray-400">
                         Filtra y analiza el desempeño de ventas por periodo y métrica.
                     </p>
+                    <button onClick={exportToExcel} className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"> Exportar a Excel </button>
+                    // Dentro del componente GestionInventarioAlmacen, junto al botón de Cerrar Sesión
+<button 
+    onClick={() => router.push('/administrador/usuarios/lista')} 
+    style={{
+        position: 'absolute',
+        top: '20px',
+        right: '120px', // Ajusta la separación con el botón "Cerrar Sesión"
+        background: 'none',
+        border: 'none',
+        color: '#eef0f5ff',
+        textDecoration: 'underline',
+        cursor: 'pointer',
+        fontSize: '14px',
+        zIndex: 10,
+    }}
+>
+    Volver Atrás
+</button>
+
                 </header>
 
                 {/* Bloque de Filtros (Card Oscura) */}

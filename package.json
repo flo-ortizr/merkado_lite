@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@nestjs/platform-express": "^11.1.9",
+    "multer": "^2.0.2",
     "mysql2": "^3.15.3"
   }
 }
