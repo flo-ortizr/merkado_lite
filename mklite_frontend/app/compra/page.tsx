@@ -4,14 +4,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Comprapage.module.css';
+import { confirmOrder } from '@/services/OrderService';
+
+
+import { Order } from '../models/Order';
+import { OrderDetail } from '../models/OrderDetail';
+import { Product } from '../models/Product';
+import { ConfirmOrderDto } from '../models/ConfirmOrderDto';
 
 interface CartItem {
-    id: number;
-    nombre: string;
-    precio: string;
-    image: string;
-    quantity: number;
-    priceNumeric: number;
+    id_product: number;
+  name: string;
+  price: string;
+  image_url: string;
+  quantity: number;
+  priceNumeric: number;
 }
 
 export default function CompraPage() { 
@@ -214,20 +221,44 @@ export default function CompraPage() {
   const finalDeliveryCost = deliveryMethod === 'delivery' ? dynamicDeliveryCost : 0;
   const total = subtotal - discountAmount + finalDeliveryCost;
 
-  const handleNextStep = () => {
-    if (activeTab < 1) setActiveTab(prev => prev + 1);
-    else {
-      alert('Compra realizada con éxito!');
-      localStorage.removeItem('mklite_cart');
-      localStorage.removeItem('mklite_discount_applied');
-      router.push('/Home');
-    }
-  };
+  
 
   const handlePrevStep = () => {
     if (activeTab > 0) setActiveTab(prev => prev - 1);
     else router.push('/carrito');
   };
+
+    const customerId = 4;
+// ------------------ FINALIZAR COMPRA ------------------
+const handleNextStep = async () => {
+  if (activeTab === 0) {
+    setActiveTab(1);
+    return;
+  }
+
+  try {
+    const confirmDto: ConfirmOrderDto = {
+      delivery_method: deliveryMethod === 'delivery' ? 'domicilio' : 'retiro',
+      payment_method: 'efectivo',
+      items: cartItems.map(item => ({
+        productId: item.id_product,
+        quantity: item.quantity,
+      })),
+    };
+
+    await confirmOrder(customerId, confirmDto);
+
+    // Limpiar carrito
+    localStorage.removeItem('mklite_cart');
+    localStorage.removeItem('mklite_discount_applied');
+
+    alert('¡Compra realizada con éxito!');
+    router.push('/Home');
+  } catch (error: any) {
+    alert(error.message || 'Error al procesar la compra');
+  }
+};
+
 
   return (
     <div className={styles.container}>
@@ -366,12 +397,12 @@ export default function CompraPage() {
           <h3 className={styles.summaryTitle}>Resumen de la compra</h3>
           <div className={styles.summaryProducts}>
             {cartItems.map(item => (
-                <div key={item.id} className={styles.summaryItem}>
+                <div key={item.id_product} className={styles.summaryItem}>
                   <div className={styles.summaryItemImage}>
-                    <Image src={item.image} alt={item.nombre} width={40} height={40} style={{objectFit: 'contain'}} />
+                    <Image src={item.image_url} alt={item.name} width={40} height={40} style={{objectFit: 'contain'}} />
                   </div>
                   <div className={styles.summaryItemDetails}>
-                    <h4>{item.nombre}</h4>
+                    <h4>{item.name}</h4>
                     <p>Cantidad: {item.quantity}</p>
                   </div>
                   <span className={styles.summaryItemPrice}>Bs. {item.priceNumeric.toFixed(2)}</span>

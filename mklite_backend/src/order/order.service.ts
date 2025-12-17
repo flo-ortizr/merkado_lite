@@ -13,70 +13,68 @@ import { OrderHistoryDto } from './dto/order_history.dto';
 export class OrderService {
 
   // ==================== CONFIRMAR PEDIDO ====================
-  async confirmOrder(customerId: number, dto: ConfirmOrderDto) {
+ async confirmOrder(customerId: number, dto: ConfirmOrderDto) {
 
-    // 1. obtener carrito activo
-    const cart = await AppDataSource.manager.findOne(Cart, {
-      where: { customer: { id_customer: customerId }, status: 'active' },
-      relations: ['items', 'items.product'],
-    });
-
-    if (!cart) throw new BadRequestException('El cliente no tiene carrito activo');
-    if (!cart.items || cart.items.length === 0)
-      throw new BadRequestException('El carrito está vacío');
-
-    // 2. crear orden
-    const order = AppDataSource.manager.create(Order, {
-      customer: cart.customer,
-      order_date: new Date(),
-      status: 'pending',
-      payment_method: dto.payment_method,
-      total: 0,
-    });
-
-    const savedOrder = await AppDataSource.manager.save(Order, order);
-
-    // 3. crear detalles 
-    let total = 0;
-
-    for (const item of cart.items) {
-
-      const subtotal = Number(item.quantity) * Number(item.product.price);
-      total += subtotal;
-
-      const detail = AppDataSource.manager.create(OrderDetail, {
-        order: savedOrder,
-        product: item.product,
-        quantity: item.quantity,
-        subtotal,
-      });
-
-      await AppDataSource.manager.save(OrderDetail, detail);
-    }
-
-    // 4. actualizar total
-    savedOrder.total = total;
-    await AppDataSource.manager.save(Order, savedOrder);
-
-    // 5. crear registro de entrega
-    const delivery = AppDataSource.manager.create(Delivery, {
-      order: savedOrder,
-      method: dto.delivery_method,
-      status: 'pending',
-    });
-
-    await AppDataSource.manager.save(Delivery, delivery);
-
-    // 6. cerrar carrito
-    cart.status = 'ordered';
-    await AppDataSource.manager.save(Cart, cart);
-
-    return {
-      message: 'Pedido generado exitosamente',
-      order: savedOrder,
-      delivery,
-    };
+  if (!dto.items || dto.items.length === 0) {
+    throw new BadRequestException('El pedido no tiene productos');
   }
+
+  // 1. obtener cliente
+  const customer = await AppDataSource.manager.findOne(Customer, {
+    where: { id_customer: customerId },
+  });
+
+  if (!customer) throw new BadRequestException('Cliente no encontrado');
+
+  // 2. crear orden
+  const order = AppDataSource.manager.create(Order, {
+    customer,
+    order_date: new Date(),
+    status: 'pending',
+    payment_method: dto.payment_method,
+    total: 0,
+  });
+
+  const savedOrder = await AppDataSource.manager.save(Order, order);
+
+  // 3. crear detalles (AQUÍ SE "VA AUMENTANDO")
+  let total = 0;
+
+  for (const item of dto.items) {
+
+    const subtotal = item.quantity * item.price;
+    total += subtotal;
+
+    const detail = AppDataSource.manager.create(OrderDetail, {
+      order: savedOrder,
+      product: { id_product: item.productId },
+      quantity: item.quantity,
+      subtotal,
+    });
+
+    await AppDataSource.manager.save(OrderDetail, detail);
+  }
+
+  // 4. actualizar total
+  savedOrder.total = total;
+  await AppDataSource.manager.save(Order, savedOrder);
+
+  // 5. crear delivery
+  const delivery = AppDataSource.manager.create(Delivery, {
+    order: savedOrder,
+    method: dto.delivery_method,
+    status: 'pending',
+  });
+
+  await AppDataSource.manager.save(Delivery, delivery);
+
+  return {
+    message: 'Pedido generado exitosamente',
+    order: savedOrder,
+    delivery,
+  };
+}
+
 
   async getOrderHistory(customerId: number): Promise<OrderHistoryDto[]> {
   const customer = await AppDataSource.manager.findOne(Customer, {
