@@ -178,7 +178,7 @@ const router = useRouter();
 
                         {/* DELETE */}
                         <button
-                          onClick={() => handleDelete(p.id_promotion)}
+                          onClick={() => handleDelete(p.id_promotion || 0)}
                           className="text-red-400 hover:text-red-300"
                         >
                           Eliminar

@@ -4,14 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image'; 
 import { useRouter } from 'next/navigation'; 
 import styles from './HomePage.module.css'; 
-// --- 1. Tipos ---
-type Product = {
-  id: number;
-  nombre: string;
-  precio: string;
-  description: string;
-  image: string;
-};
+import { Product } from '../models/Product';
+import { fetchProducts } from '../../services/productService';
+import { getAllCategories } from '@/services/categoryService';
+import { Category } from '../models/Category';
 
 type ProductCardProps = {
   product: Product;
@@ -103,17 +99,25 @@ const ProductCard = ({ product, onCardClick, onAddToCart }: ProductCardProps) =>
     onAddToCart(product, quantity);
     setQuantity(1);
   };
+const imageUrl = product.image_url ? product.image_url.replace(/^['"]|['"]$/g, '') : '/Imagines/arroz.jpeg';
 
   return (
     <div onClick={() => onCardClick(product)} className={styles.productCard}>
       <div className={styles.cardImage}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain', padding: '10px' }} />
+         <Image
+  src={imageUrl}
+  alt={product.name}
+  fill
+  style={{ objectFit: 'contain', padding: '10px' }}
+/>
+
+
         </div>
       </div>
       <div className={styles.cardContent}>
-        <h3 className={styles.cardTitle}>{product.nombre}</h3>
-        <span className={styles.cardPrice}>{product.precio}</span>
+        <h3 className={styles.cardTitle}>{product.name}</h3>
+        <span className={styles.cardPrice}>{product.price}</span>
         
         <div className={styles.actionRow}>
           <div className={styles.qtySelector}>
@@ -148,7 +152,7 @@ const ProductShelf = ({ id, title, products, forwardRef, onProductClick, onAddTo
         <button className={`${styles.sliderBtn} ${styles.sliderBtnLeft}`} onClick={() => scroll('left')}>❮</button>
         <div className={styles.productTrack} ref={trackRef}>
           {products.map((producto) => (
-            <ProductCard key={producto.id} product={producto} onCardClick={onProductClick} onAddToCart={onAddToCart} />
+            <ProductCard key={producto.id_product} product={producto} onCardClick={onProductClick} onAddToCart={onAddToCart} />
           ))}
         </div>
         <button className={`${styles.sliderBtn} ${styles.sliderBtnRight}`} onClick={() => scroll('right')}>❯</button>
@@ -163,6 +167,7 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
   const handleIncrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => prev + 1); };
   const handleDecrementModal = (e: React.MouseEvent) => { e.stopPropagation(); setQuantityModal(prev => (prev > 1 ? prev - 1 : 1)); };
   const handleAddToCartModal = (e: React.MouseEvent) => { e.stopPropagation(); onAddToCart(product, quantityModal); setQuantityModal(1); onClose(); };
+const imageUrl = product.image_url ? product.image_url.replace(/^['"]|['"]$/g, '') : '/Imagines/arroz.jpeg';
 
   return (
     <div onClick={onClose} className={styles.modalBackdrop}>
@@ -171,14 +176,20 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
         <div className={styles.modalContent}>
           <div className={styles.modalImage}>
              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-               <Image src="/Imagines/arroz.jpeg" alt={product.nombre} fill style={{ objectFit: 'contain' }} />
+             <Image
+  src={imageUrl}
+  alt={product.name}
+  fill
+  style={{ objectFit: 'contain', padding: '10px' }}
+/>
+
              </div>
           </div>
           <div className={styles.modalInfo}>
-            <h1 className={styles.modalTitle}>{product.nombre}</h1>
+            <h1 className={styles.modalTitle}>{product.name}</h1>
             <p className={styles.modalDescription}>{product.description}</p>
             <div className={styles.modalCategory}>Categoría: General</div>
-            <h2 className={styles.modalPrice}>{product.precio}</h2>
+            <h2 className={styles.modalPrice}>{product.price}</h2>
             <span className={styles.statusBadge}>Disponible</span>
             <div className={styles.modalFooter}>
               <div className={styles.qtySelectorModal}>
@@ -204,19 +215,10 @@ const ProductModal = ({ product, onClose, onAddToCart }: ProductModalProps) => {
 
 export default function HomePage() {
   const router = useRouter(); 
-  
-  const categoryRefs = {
-    abarrotes: useRef<HTMLElement | null>(null),
-    bebidas: useRef<HTMLElement | null>(null),
-    carnes: useRef<HTMLElement | null>(null),
-    frutas: useRef<HTMLElement | null>(null),
-    verduras: useRef<HTMLElement | null>(null),
-    lacteos: useRef<HTMLElement | null>(null),
-    panaderia: useRef<HTMLElement | null>(null),
-    limpieza: useRef<HTMLElement | null>(null),
-    personal: useRef<HTMLElement | null>(null),
-    cereales: useRef<HTMLElement | null>(null),
-  };
+   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const categoryRefs = useRef<{ [key: string]: React.RefObject<HTMLElement | null> }>({});
+const [searchTerm, setSearchTerm] = useState('');
+
 
   const [activeCategory, setActiveCategory] = useState<string>('abarrotes');
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -224,8 +226,46 @@ export default function HomePage() {
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [currentBanner, setCurrentBanner] = useState(0);
+ const [productsByCategory, setProductsByCategory] = useState<{ [key: string]: Product[] }>({});
 
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categories = await getAllCategories();
+        setCategoriesList(categories);
+
+        // Crear refs dinámicamente según las categorías
+        const refs: { [key: string]: React.RefObject<HTMLElement | null> } = {};
+        categories.forEach(cat => {
+          const key = cat.name.toLowerCase();
+          refs[key] = React.createRef<HTMLElement>();
+        });
+        categoryRefs.current = refs;
+      } catch (err) {
+        console.error('Error cargando categorías:', err);
+      }
+    };
+
+    loadCategories();
+  }, []);
   
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const products = await fetchProducts();
+        const grouped: { [key: string]: Product[] } = {};
+        products.forEach(prod => {
+          const catKey = prod.category?.name.toLowerCase() || 'otros';
+          if (!grouped[catKey]) grouped[catKey] = [];
+          grouped[catKey].push(prod);
+        });
+        setProductsByCategory(grouped);
+      } catch (err) {
+        console.error('Error cargando productos:', err);
+      }
+    };
+    loadProducts();
+  }, []);
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % BANNERS.length);
@@ -240,19 +280,18 @@ export default function HomePage() {
       });
     }, { rootMargin: '-150px 0px -70% 0px' });
 
-    Object.values(categoryRefs).forEach((ref) => {
-      if (ref.current) observer.observe(ref.current);
-    });
+    Object.values(categoryRefs.current).forEach((ref) => {
+  if (ref.current) observer.observe(ref.current);
+});
+
     return () => observer.disconnect();
   }, []);
 
   const handleScrollTo = (key: string) => {
-    const ref = categoryRefs[key as keyof typeof categoryRefs];
+    const ref = categoryRefs.current[key];
     if (ref && ref.current) {
-      
       const y = ref.current.getBoundingClientRect().top + window.pageYOffset - 140;
       window.scrollTo({ top: y, behavior: 'smooth' });
-     
     }
   };
 
@@ -269,10 +308,13 @@ export default function HomePage() {
   const handleAddToCart = (product: Product, qty: number) => {
     const cartJson = localStorage.getItem('mklite_cart');
     let cart = cartJson ? JSON.parse(cartJson) : [];
-    const priceNum = parseFloat(product.precio.replace('Bs. ', ''));
+    const priceNum = parseFloat(product.price.replace('Bs. ', ''));
     
     // @ts-ignore
-    const existingItemIndex = cart.findIndex((item) => item.id === product.id);
+   const existingItemIndex = cart.findIndex(
+  (item: any) => item.id_product === product.id_product
+);
+
 
     if (existingItemIndex >= 0) {
       cart[existingItemIndex].quantity += qty;
@@ -286,143 +328,15 @@ export default function HomePage() {
 
   const handleKeepShopping = () => setIsConfirmationOpen(false);
   const handleGoToCart = () => { setIsConfirmationOpen(false); router.push('/carrito'); };
+const filteredProductsByCategory = Object.fromEntries(
+  Object.entries(productsByCategory).map(([category, products]) => [
+    category,
+    products.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ),
+  ])
+);
 
-  const productData: { [key: string]: Product[] } = {
-    abarrotes: [
-      { id: 101, nombre: 'Arroz Grano de Oro 1Kg', precio: 'Bs. 7.00', description: 'Arroz de grano seleccionado.', image: '/Imagines/arrozz.png' },
-      { id: 102, nombre: 'Fideo Lazzaroni 1Kg', precio: 'Bs. 6.50', description: 'Fideo ideal para sopas y guisos.', image: '/Imagines/fideo.png' },
-      { id: 103, nombre: 'Harina Famosa 1Kg', precio: 'Bs. 6.00', description: 'Harina de trigo fortificada.', image: '/Imagines/harina.png' },
-      { id: 104, nombre: 'Aceite Fino 900ml', precio: 'Bs. 11.00', description: 'Aceite vegetal puro y natural.', image: '/Imagines/aceite.png' },
-      { id: 105, nombre: 'Azúcar Guabirá 1Kg', precio: 'Bs. 6.00', description: 'Azúcar blanca refinada.', image: '/Imagines/azucar.png' },
-      { id: 106, nombre: 'Avena Princesa 400g', precio: 'Bs. 8.50', description: 'Avena instantánea laminada.', image: '/Imagines/Avena.png' },
-      { id: 107, nombre: 'Salsa de Tomate Kris', precio: 'Bs. 5.50', description: 'Salsa lista para pastas.', image: '/Imagines/salsadetomate.png' },
-      { id: 108, nombre: 'Atún Lidita al Aceite', precio: 'Bs. 9.00', description: 'Lomo de atún en aceite.', image: '/images/atun.png' },
-      { id: 109, nombre: 'Sal Yodada 1Kg', precio: 'Bs. 2.00', description: 'Sal de mesa.', image: '/Imagines/sal.png' },
-      { id: 110, nombre: 'Lenteja 500g', precio: 'Bs. 8.00', description: 'Lenteja seleccionada.', image: '/Imagines/lenteja.png' }
-    ],
-    bebidas: [
-      { id: 201, nombre: 'Coca Cola 2L', precio: 'Bs. 10.00', description: 'Sabor original refrescante.', image: '/Imagines/cocacola.png' },
-      { id: 202, nombre: 'Agua Vital 2L', precio: 'Bs. 5.00', description: 'Agua purificada sin gas.', image: '/Imagines/aguavital.png' },
-      { id: 203, nombre: 'Simba Pomelo 2L', precio: 'Bs. 9.00', description: 'Refresco sabor pomelo.', image: '/Imagines/simbapomelo.jpg' },
-      { id: 204, nombre: 'Cerveza Paceña 710ml', precio: 'Bs. 14.00', description: 'Cerveza tradicional boliviana.', image: '/Imagines/cervezapaceña.png' },
-      { id: 205, nombre: 'Jugo Del Valle Durazno', precio: 'Bs. 12.00', description: 'Néctar de fruta natural.', image: '/Imagines/jugodelvalle.png' },
-      { id: 206, nombre: 'Powerade Azul 600ml', precio: 'Bs. 7.00', description: 'Bebida isotónica.', image: '/Imagines/powerade.png' },
-      { id: 207, nombre: 'Maltín 500ml', precio: 'Bs. 6.00', description: 'Bebida de malta sin alcohol.', image: '/Imagines/maltin.png' },
-      { id: 208, nombre: 'Vino Kohlberg Tinto', precio: 'Bs. 35.00', description: 'Vino de mesa tarijeño.', image: '/Imagines/vino.png' },
-      { id: 209, nombre: 'Sprite 2L', precio: 'Bs. 10.00', description: 'Lima limón.', image: '/Imagines/sprite.png' },
-      { id: 210, nombre: 'Fanta Naranja 2L', precio: 'Bs. 10.00', description: 'Naranja.', image: '/Imagines/fanta.png' }
-    ],
-    carnes: [
-      { id: 301, nombre: 'Pollo Sofía (Kg)', precio: 'Bs. 15.50', description: 'Pollo fresco grado A.', image: '/Imagines/pollosofia.png' },
-      { id: 302, nombre: 'Carne Molida Especial', precio: 'Bs. 32.00', description: 'Carne de res magra.', image: '/Imagines/carnemolida.png' },
-      { id: 303, nombre: 'Chuleta de Cerdo (Kg)', precio: 'Bs. 28.00', description: 'Chuleta tierna de cerdo.', image: '/Imagines/chuletacerdo.png' },
-      { id: 304, nombre: 'Costilla de Res (Kg)', precio: 'Bs. 25.00', description: 'Ideal para churrasco.', image: '/Imagines/chuletares.png' },
-      { id: 305, nombre: 'Chorizo Parrillero', precio: 'Bs. 38.00', description: 'Chorizo ahumado.', image: '/Imagines/chorizo.png' },
-      { id: 306, nombre: 'Mortadela San Juan', precio: 'Bs. 12.00', description: 'Fiambre de primera calidad.', image: '/Imagines/mortadela.png' },
-      { id: 307, nombre: 'Milanesa de Pollo (Kg)', precio: 'Bs. 35.00', description: 'Pechuga fileteada.', image: '/Imagines/milanesa.png' },
-      { id: 308, nombre: 'Nuggets de Pollo (Kg)', precio: 'Bs. 18.00', description: 'Hígado fresco.', image: '/Imagines/nuggets.png' },
-      { id: 309, nombre: 'Salchicha Viena', precio: 'Bs. 20.00', description: 'Paquete 500g.', image: '/Imagines/salchicha.png' },
-      { id: 310, nombre: 'Alitas de Pollo (Kg)', precio: 'Bs. 18.00', description: 'Alitas frescas.', image: '/Imagines/alitas.jpg' }
-    ],
-    frutas: [
-      { id: 401, nombre: 'Manzana Royal (Kg)', precio: 'Bs. 12.00', description: 'Manzanas rojas dulces.', image: '/Imagines/manzana.png' },
-      { id: 402, nombre: 'Banana Chapare (Docena)', precio: 'Bs. 5.00', description: 'Banana dulce nacional.', image: '/Imagines/banana.png' },
-      { id: 403, nombre: 'Naranja Valencia (25u)', precio: 'Bs. 15.00', description: 'Naranja para jugo.', image: '/Imagines/naranja.png' },
-      { id: 404, nombre: 'Uva Tarijeña (Kg)', precio: 'Bs. 14.00', description: 'Uva dulce de temporada.', image: '/Imagines/uva.png' },
-      { id: 405, nombre: 'Piña Chapare (Und)', precio: 'Bs. 10.00', description: 'Piña miel dulce.', image: '/Imagines/piña.png' },
-      { id: 406, nombre: 'Papaya (Und)', precio: 'Bs. 8.00', description: 'Papaya madura.', image: '/Imagines/papaya.png' },
-      { id: 407, nombre: 'Sandía (Und)', precio: 'Bs. 20.00', description: 'Sandía roja y dulce.', image: '/Imagines/sandia.png' },
-      { id: 408, nombre: 'Mandarina (25u)', precio: 'Bs. 12.00', description: 'Mandarina criolla.', image: '/Imagines/mandarina.png' },
-      { id: 409, nombre: 'Frutilla (Kg)', precio: 'Bs. 15.00', description: 'Frutilla fresca.', image: '/Imagines/frutilla.png' },
-      { id: 410, nombre: 'Durazno (Kg)', precio: 'Bs. 18.00', description: 'Durazno de temporada.', image: '/Imagines/durazno.png' }
-    ],
-    verduras: [
-      { id: 501, nombre: 'Tomate Perita (Kg)', precio: 'Bs. 6.00', description: 'Tomate para ensalada.', image: '/Imagines/tomate.avif' },
-      { id: 502, nombre: 'Lechuga Crespa (Und)', precio: 'Bs. 3.00', description: 'Lechuga hidropónica.', image: '/Imagines/lechuga.avif' },
-      { id: 503, nombre: 'Zanahoria (Kg)', precio: 'Bs. 4.00', description: 'Zanahoria lavada.', image: '/Imagines/zanahoria.avif' },
-      { id: 504, nombre: 'Cebolla Roja (Kg)', precio: 'Bs. 5.00', description: 'Cebolla cabeza grande.', image: '/Imagines/cebolla.avif' },
-      { id: 505, nombre: 'Papa Imilla (Arroba)', precio: 'Bs. 45.00', description: 'Papa harinosa.', image: '/Imagines/papa.avif' },
-      { id: 506, nombre: 'Pimenton Verde (Kg)', precio: 'Bs. 10.00', description: 'Pimenton verde.', image: '/Imagines/pimenton.avif' },
-      { id: 507, nombre: 'Zapallo (Trozo)', precio: 'Bs. 5.00', description: 'Zapallo dulce.', image: '/Imagines/zapallo.avif' },
-      { id: 508, nombre: 'Brócoli (Und)', precio: 'Bs. 6.00', description: 'Brócoli fresco.', image: '/Imagines/brocoli.avif' },
-      { id: 509, nombre: 'Vainita (Kg)', precio: 'Bs. 8.00', description: 'Vainita verde.', image: '/Imagines/vaina.avif' },
-      { id: 510, nombre: 'Espinaca (Amarro)', precio: 'Bs. 4.00', description: 'Espinaca fresca.', image: '/Imagines/espinaca.avif' }
-    ],
-    lacteos: [
-      { id: 601, nombre: 'Leche PIL Entera 1L', precio: 'Bs. 6.00', description: 'Leche fluida pasteurizada.', image: '/Imagines/leche.avif' },
-      { id: 602, nombre: 'Yogurt PIL Frutilla 1L', precio: 'Bs. 12.00', description: 'Yogurt bebible.', image: '/Imagines/yogurt.png' },
-      { id: 603, nombre: 'Mantequilla Regia 200g', precio: 'Bs. 10.00', description: 'Mantequilla con sal.', image: '/Imagines/mantequilla.png' },
-      { id: 604, nombre: 'Queso San Javier (Kg)', precio: 'Bs. 38.00', description: 'Queso fresco.', image: '/Imagines/queso.avif' },
-      { id: 605, nombre: 'Leche Chocolatada PIL', precio: 'Bs. 6.50', description: 'Sabor chocolate.', image: '/Imagines/lechechocolatada.avif' },
-      { id: 606, nombre: 'Crema de Leche PIL', precio: 'Bs. 15.00', description: 'Ideal para postres.', image: '/Imagines/cremadeleche.avif' },
-      { id: 607, nombre: 'Dulce de Leche PIL', precio: 'Bs. 12.00', description: 'Manjar tradicional.', image: '/Imagines/dulcedeleche.avif' },
-      { id: 608, nombre: 'Helado Delizia 1L', precio: 'Bs. 25.00', description: 'Sabor Vainilla.', image: '/Imagines/helado.avif' },
-      { id: 609, nombre: 'Leche Deslactosada PIL', precio: 'Bs. 7.00', description: 'Leche Light.', image: '/Imagines/lechedeslactosada.png' },
-      { id: 610, nombre: 'Kefir Natural', precio: 'Bs. 18.00', description: 'Probiótico natural.', image: '/Imagines/kefir.avif' }
-    ],
-    panaderia: [
-      { id: 701, nombre: 'Pan Molde Blanco', precio: 'Bs. 10.00', description: 'Pan suave para sandwich.', image: '/Imagines/panmolde.png' },
-      { id: 702, nombre: 'Pan Integral', precio: 'Bs. 12.00', description: 'Alto en fibra.', image: '/Imagines/panintegral.png' },
-      { id: 703, nombre: 'Marraqueta (10u)', precio: 'Bs. 5.00', description: 'Pan de batalla crocante.', image: '/Imagines/marraqueta.png' },
-      { id: 704, nombre: 'Cuñapé (Bolsa)', precio: 'Bs. 15.00', description: 'Horneado de queso.', image: '/Imagines/cuñape.avif' },
-      { id: 705, nombre: 'Panetón San Antonio', precio: 'Bs. 25.00', description: 'Con chispas de chocolate.', image: '/Imagines/paneton.avif' },
-      { id: 706, nombre: 'Galletas Surtidas', precio: 'Bs. 18.00', description: 'Variedad de galletas.', image: '/Imagines/galletassurtidas.avif' },
-      { id: 707, nombre: 'Queque de Naranja', precio: 'Bs. 10.00', description: 'Queque casero.', image: '/Imagines/queque.avif' },
-      { id: 708, nombre: 'Empanadas de Queso', precio: 'Bs. 4.00', description: 'Empanada para freir.', image: '/Imagines/empanadas.avif' },
-      { id: 709, nombre: 'Alfajor de Chocolate', precio: 'Bs. 5.00', description: 'Relleno de dulce de leche.', image: '/Imagines/alfajor.avif' },
-      { id: 710, nombre: 'Torta Selva Negra', precio: 'Bs. 80.00', description: 'Torta entera.', image: '/Imagines/torta.avif' }
-    ],
-    limpieza: [
-      { id: 801, nombre: 'Lavandina Sapolio 1L', precio: 'Bs. 5.00', description: 'Desinfectante potente.', image: '/Imagines/lavandina.avif' },
-      { id: 802, nombre: 'Detergente OMO 1Kg', precio: 'Bs. 16.00', description: 'Detergente en polvo.', image: '/Imagines/detergente.avif' },
-      { id: 803, nombre: 'Jabón Bolívar Barra', precio: 'Bs. 4.00', description: 'Jabón para ropa.', image: '/Imagines/jabon.png' },
-      { id: 804, nombre: 'Limpiapisos TodoBrillo', precio: 'Bs. 8.00', description: 'Aroma Lavanda.', image: '/Imagines/limpiapisos.avif' },
-      { id: 805, nombre: 'Esponja Scotch Brite', precio: 'Bs. 3.00', description: 'Fibra verde.', image: '/Imagines/esponja.png' },
-      { id: 806, nombre: 'Suavizante Ola', precio: 'Bs. 10.00', description: 'Para ropa suave.', image: '/Imagines/suavizante.png' },
-      { id: 807, nombre: 'Insecticida Rid', precio: 'Bs. 22.00', description: 'Mata moscas y mosquitos.', image: '/Imagines/insecticida.avif' },
-      { id: 808, nombre: 'Papel Higiénico Scott', precio: 'Bs. 15.00', description: 'Paquete de 12 rollos.', image: '/Imagines/papel.avif' },
-      { id: 809, nombre: 'Lavavajilla Ola', precio: 'Bs. 12.00', description: 'Arranca grasa.', image: '/Imagines/lavavajilla.avif' },
-      { id: 810, nombre: 'Escoba Plástica', precio: 'Bs. 20.00', description: 'Escoba resistente.', image: '/Imagines/escoba.png' }
-    ],
-    personal: [
-      { id: 901, nombre: 'Shampoo Dove 200Ml', precio: 'Bs. 22.00', description: 'Shampoo Dove Reconstrucción.', image: '/Imagines/shampoo.avif' },
-      { id: 902, nombre: 'Jabón Lux (Pack 3)', precio: 'Bs. 12.00', description: 'Toque de vainilla.', image: '/Imagines/jabonlux.avif' },
-      { id: 903, nombre: 'Pasta Dental Oral B', precio: 'Bs. 10.00', description: 'Protección anticaries.', image: '/Imagines/pastadental.avif' },
-      { id: 904, nombre: 'Desodorante Axe Black', precio: 'Bs. 18.00', description: 'Aerosol hombre.', image: '/Imagines/desodorante.avif' },
-      { id: 905, nombre: 'Crema Nivea Lata', precio: 'Bs. 15.00', description: 'Hidratante clásico.', image: '/Imagines/crema.avif' },
-      { id: 906, nombre: 'Pañales Pampers', precio: 'Bs. 60.00', description: 'Paquete 30 unidades.', image: '/Imagines/pañales.avif' },
-      { id: 907, nombre: 'Toallas Húmedas', precio: 'Bs. 15.00', description: 'Para adulto.', image: '/Imagines/toallashumedas.avif' },
-      { id: 908, nombre: 'Cepillo Dental Bamboo', precio: 'Bs. 8.00', description: 'Cerdas medias.', image: '/Imagines/cepillo.avif' },
-      { id: 909, nombre: 'Afeitadora Gillette', precio: 'Bs. 5.00', description: 'Desechable.', image: '/Imagines/afeitadora.avif' },
-      { id: 910, nombre: 'Talco para Pies', precio: 'Bs. 12.00', description: 'Mexsana.', image: '/Imagines/talco.png' }
-    ],
-    cereales: [
-      { id: 1001, nombre: 'Galletas Mabel Wafer', precio: 'Bs. 4.50', description: 'Oblea sabor vainilla.', image: '/Imagines/mabel.avif' },
-      { id: 1002, nombre: 'Cereal Chocapic 200g', precio: 'Bs. 25.00', description: 'Cereal de chocolate.', image: '/Imagines/chocapic.avif' },
-      { id: 1003, nombre: 'Avena Instantánea', precio: 'Bs. 10.00', description: 'Bolsa 400g.', image: '/Imagines/avenaa.avif' },
-      { id: 1004, nombre: 'Granola con Miel El Maná', precio: 'Bs. 20.00', description: 'Bolsa 500g.', image: '/Imagines/granola.avif' },
-      { id: 1005, nombre: 'Barra de Cereal Cereal Mix', precio: 'Bs. 3.00', description: 'Sabor frutilla.', image: '/Imagines/barradecereal.avif' },
-      { id: 1006, nombre: 'Maíz para Pipoca', precio: 'Bs. 6.00', description: 'Grano seleccionado.', image: '/Imagines/maizpipoca.avif' },
-      { id: 1007, nombre: 'Zucaritas Kellogg\'s', precio: 'Bs. 28.00', description: 'Hojuelas azucaradas.', image: '/Imagines/zucaritas.avif' },
-      { id: 1008, nombre: 'Corn Flakes', precio: 'Bs. 22.00', description: 'Hojuelas de maíz.', image: '/Imagines/corn.avif' },
-      { id: 1009, nombre: 'Quinua Real', precio: 'Bs. 15.00', description: 'Grano de oro.', image: '/Imagines/quinua.avif' },
-      { id: 1010, nombre: 'Trigo Pelado', precio: 'Bs. 8.00', description: 'Para sopa.', image: '/Imagines/trigo.png' }
-    ],
-  };
-
-  // Lista de categorías
-  const categoriesList = [
-    { key: 'abarrotes', label: 'Abarrotes' },
-    { key: 'bebidas', label: 'Bebidas' },
-    { key: 'carnes', label: 'Carnes' },
-    { key: 'frutas', label: 'Frutas' },
-    { key: 'verduras', label: 'Verduras' },
-    { key: 'lacteos', label: 'Lácteos' },
-    { key: 'panaderia', label: 'Panadería' },
-    { key: 'limpieza', label: 'Limpieza' },
-    { key: 'personal', label: 'Personal' },
-    { key: 'cereales', label: 'Cereales' },
-  ];
 
   return (
     <div className={styles.container}>
@@ -430,10 +344,17 @@ export default function HomePage() {
         <div className={styles.headerContent}>
           <div className={styles.logo}>MERKADO LITE</div>
           
-          <input type="text" placeholder="¿Qué estás buscando?" className={styles.searchBar} />
+          <input
+  type="text"
+  placeholder="¿Qué estás buscando?"
+  className={styles.searchBar}
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+
           
           <div className={styles.userNav}>
-            <span>Cuenta</span>
+           
             <div className={styles.cartContainer} onClick={handleGoToCart}>
               <svg className={styles.headerCartIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="9" cy="21" r="1"></circle>
@@ -492,31 +413,40 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className={styles.categoryBar}>
-          {categoriesList.map((cat) => (
-            <span 
-              key={cat.key}
-              onClick={() => handleScrollTo(cat.key)} 
-              className={`${styles.categoryLink} ${activeCategory === cat.key ? styles.categoryLinkActive : ''}`}
-            >
-              {cat.label}
-            </span>
-          ))}
-        </div>
+       <div className={styles.categoryBar}>
+  {categoriesList.map((cat) => {
+    const key = cat.name.toLowerCase();
+    return (
+      <span 
+        key={cat.id_category}
+        onClick={() => handleScrollTo(key)}
+        className={`${styles.categoryLink} ${activeCategory === key ? styles.categoryLinkActive : ''}`}
+      >
+        {cat.name}
+      </span>
+    );
+  })}
+</div>
 
-        <div className={styles.shelfContainer}>
-          {categoriesList.map((cat) => (
-              <ProductShelf 
-                key={cat.key}
-                id={cat.key} 
-                title={cat.label} 
-                products={productData[cat.key] || []} 
-                forwardRef={categoryRefs[cat.key as keyof typeof categoryRefs]} 
-                onProductClick={handleProductClick}
-                onAddToCart={handleAddToCart} 
-              />
-          ))}
-        </div>
+
+
+       <div className={styles.shelfContainer}>
+  {categoriesList.map((cat) => {
+    const key = cat.name.toLowerCase();
+    return (
+      <ProductShelf
+  key={cat.id_category}
+  id={key}
+  title={cat.name}
+  products={filteredProductsByCategory[key] || []}
+  forwardRef={categoryRefs.current[key]}
+  onProductClick={handleProductClick}
+  onAddToCart={handleAddToCart}
+/>
+
+    );
+  })}
+</div>
       </section>
 
       {isDetailOpen && <ProductModal product={selectedProduct} onClose={() => setIsDetailOpen(false)} onAddToCart={handleAddToCart} />}

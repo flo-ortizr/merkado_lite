@@ -10,3 +10,4 @@ export const fetchProducts = async (): Promise<Product[]> => {
     throw new Error(error.response?.data?.message || "Error al obtener productos");
   }
 };
+
