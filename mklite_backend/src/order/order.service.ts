@@ -8,27 +8,22 @@ import { ConfirmOrderDto } from './dto/confirm_order.dto';
 import { Delivery } from 'src/delivery/delivery.entity';
 import { Customer } from 'src/customer/customer.entity';
 import { OrderHistoryDto } from './dto/order_history.dto';
+import { Product } from 'src/product/product.entity';
 
 @Injectable()
 export class OrderService {
 
   // ==================== CONFIRMAR PEDIDO ====================
- async confirmOrder(customerId: number, dto: ConfirmOrderDto) {
+async confirmOrder(customerId: number, dto: ConfirmOrderDto) {
 
   if (!dto.items || dto.items.length === 0) {
     throw new BadRequestException('El pedido no tiene productos');
   }
 
-  // 1. obtener cliente
-  const customer = await AppDataSource.manager.findOne(Customer, {
-    where: { id_customer: customerId },
-  });
 
-  if (!customer) throw new BadRequestException('Cliente no encontrado');
-
-  // 2. crear orden
+  // 2. crear orden (CON cliente)
   const order = AppDataSource.manager.create(Order, {
-    customer,
+    
     order_date: new Date(),
     status: 'pending',
     payment_method: dto.payment_method,
@@ -37,17 +32,26 @@ export class OrderService {
 
   const savedOrder = await AppDataSource.manager.save(Order, order);
 
-  // 3. crear detalles (AQUÍ SE "VA AUMENTANDO")
+  // 3. crear detalles
   let total = 0;
 
   for (const item of dto.items) {
 
-    const subtotal = item.quantity * item.price;
+    // 🔐 obtener precio REAL desde BD
+    const product = await AppDataSource.manager.findOne(Product, {
+      where: { id_product: item.productId },
+    });
+
+    if (!product) {
+      throw new BadRequestException(`Producto ${item.productId} no encontrado`);
+    }
+
+    const subtotal = item.quantity * product.price;
     total += subtotal;
 
     const detail = AppDataSource.manager.create(OrderDetail, {
       order: savedOrder,
-      product: { id_product: item.productId },
+      product,
       quantity: item.quantity,
       subtotal,
     });
@@ -59,21 +63,12 @@ export class OrderService {
   savedOrder.total = total;
   await AppDataSource.manager.save(Order, savedOrder);
 
-  // 5. crear delivery
-  const delivery = AppDataSource.manager.create(Delivery, {
-    order: savedOrder,
-    method: dto.delivery_method,
-    status: 'pending',
-  });
-
-  await AppDataSource.manager.save(Delivery, delivery);
-
   return {
     message: 'Pedido generado exitosamente',
     order: savedOrder,
-    delivery,
   };
 }
+
 
 
   async getOrderHistory(customerId: number): Promise<OrderHistoryDto[]> {

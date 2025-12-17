@@ -477,3 +477,63 @@
 .confirmationButtons { display: flex; flex-direction: column; gap: 10px; }
 .btnKeepShopping { padding: 12px; border-radius: 8px; border: 2px solid #eee; background-color: #fff; color: #555; font-weight: bold; cursor: pointer; }
 .btnGoToCart { padding: 12px; border-radius: 8px; border: none; background-color: #1a1a1a; color: #fff; font-weight: bold; cursor: pointer; }
+
+
+.userNav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.historyContainer,
+.cartContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-weight: 600;
+  color: #fbfbfb;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.historyContainer:hover,
+.cartContainer:hover {
+  color: #1d0101;
+  transform: translateY(-1px);
+}
+
+.headerHistoryIcon,
+.headerCartIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #dc2626;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 9999px;
+}
+.logoutContainer {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.logoutContainer:hover {
+  color: #0a0101;
+  transform: translateY(-1px);
+}
+
+.headerLogoutIcon {
+  width: 22px;
+  height: 22px;
+}

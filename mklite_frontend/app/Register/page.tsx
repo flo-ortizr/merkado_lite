@@ -40,7 +40,7 @@ export default function RegisterPage() {
   try {
     const userToRegister = {
       ...form,
-      code_user: form.code_user?.trim() || "CLI", // si no pone nada, se envía CLI
+      code_user: form.code_user?.trim() || "CLI", 
     };
 
     await registerUser(userToRegister);
@@ -113,9 +113,26 @@ export default function RegisterPage() {
 
             {error && <p className="text-red-600 text-sm text-center font-medium">{error}</p>}
 
-            <button type="submit" className={styles.button} disabled={loading}>
-              {loading ? "Registrando..." : "Registrarme"}
-            </button>
+            <div className={styles.buttonGroup}>
+  <button
+    type="submit"
+    className={styles.button}
+    disabled={loading}
+  >
+    {loading ? "Registrando..." : "Registrarme"}
+  </button>
+
+  <button
+    type="button"
+    onClick={() => router.push("/")}
+    className={styles.cancelButton}
+  >
+    Cancelar
+  </button>
+</div>
+
+
+
           </form>
         </div>
       </div>
