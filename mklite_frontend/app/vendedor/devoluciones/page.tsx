@@ -1,10 +1,21 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 // =================================================================
 // 1. CONSTANTES Y DATOS MOCKEADOS (Simulando BBDD de Ventas y Productos)
 // =================================================================
+type ItemToProcess = {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    totalLine: number;
+    quantityToProcess: number;
+    maxQuantity: number;
+    reason: string;
+};
 
 const USER_ID = "Ana Gómez"; 
 const MOCK_DATE = new Date().toISOString().split('T')[0];
@@ -74,6 +85,7 @@ const MOCK_INVENTORY_DB = [
 // =================================================================
 
 const DevolucionesAnulaciones = () => {
+    const router = useRouter();
     // Estado de la búsqueda de ventas
     const [searchTerm, setSearchTerm] = useState('');
     const [foundSales, setFoundSales] = useState(MOCK_SALES_DB);
@@ -82,9 +94,35 @@ const DevolucionesAnulaciones = () => {
     // Estado de la acción
     const [reason, setReason] = useState('');
     const [comments, setComments] = useState('');
-    const [itemsToProcess, setItemsToProcess] = useState([]);
+    const [itemsToProcess, setItemsToProcess] = useState<ItemToProcess[]>([]);
+
     const [isProcessing, setIsProcessing] = useState(false);
     const [message, setMessage] = useState('');
+
+    const handleItemChange = useCallback(
+    (
+        itemId: string,
+        key: 'quantityToProcess' | 'reason',
+        value: string
+    ) => {
+        setItemsToProcess(prevItems =>
+            prevItems.map(item => {
+                if (item.id === itemId) {
+                    if (key === 'quantityToProcess') {
+                        const newQty = Math.max(
+                            0,
+                            Math.min(Number(value) || 0, item.maxQuantity)
+                        );
+                        return { ...item, quantityToProcess: newQty };
+                    }
+                    return { ...item, reason: value };
+                }
+                return item;
+            })
+        );
+    },
+    []
+);
 
     // Simulamos la búsqueda de ventas
     const handleSearchSale = () => {
@@ -124,21 +162,7 @@ const DevolucionesAnulaciones = () => {
         setMessage(`ÉXITO: Venta ${sale.id} seleccionada.`);
     };
 
-    // Actualiza la cantidad o el motivo para un ítem específico
-    const handleItemChange = useCallback((itemId, key, value) => {
-        setItemsToProcess(prevItems => 
-            prevItems.map(item => {
-                if (item.id === itemId) {
-                    if (key === 'quantityToProcess') {
-                        const newQty = Math.max(0, Math.min(parseInt(value) || 0, item.maxQuantity));
-                        return { ...item, quantityToProcess: newQty };
-                    }
-                    return { ...item, [key]: value };
-                }
-                return item;
-            })
-        );
-    }, []);
+  
 
     // -----------------------------------------------------------------
     // Lógica de Procesamiento (Anulación / Devolución)
@@ -352,15 +376,26 @@ const DevolucionesAnulaciones = () => {
             `}</style>
             
             <div className="w-full max-w-5xl bg-gray-800 rounded-xl shadow-2xl p-6">
-                <header className="mb-6 flex justify-between items-center border-b border-red-700 pb-4">
-                    <h1 className="text-3xl font-extrabold text-red-500">
-                        Gestión de Devoluciones y Anulaciones
-                    </h1>
-                    <div className="text-sm text-gray-400">
-                        <span className="mr-2">Vendedor: {USER_ID}</span> 
-                        <span className="font-semibold text-white">Fecha: {MOCK_DATE}</span>
-                    </div>
-                </header>
+<header className="mb-6 flex justify-between items-center border-b border-red-700 pb-4">
+    <div className="flex items-center gap-4">
+        <button
+            onClick={() => router.push('/vendedor/ventas-presenciales')}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition"
+        >
+            ← Volver
+        </button>
+
+        <h1 className="text-3xl font-extrabold text-red-500">
+            Gestión de Devoluciones y Anulaciones
+        </h1>
+    </div>
+
+    <div className="text-sm text-gray-400 text-right">
+        <span className="block">Vendedor: {USER_ID}</span>
+        <span className="font-semibold text-white">Fecha: {MOCK_DATE}</span>
+    </div>
+</header>
+
 
                 {/* Contenedor Principal: Búsqueda y Detalle */}
                 <div className="flex flex-col lg:flex-row gap-6 h-[70vh]">
