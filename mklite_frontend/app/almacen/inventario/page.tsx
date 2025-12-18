@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { fetchProducts, createProduct } from '@/services/productService'; 
 import { getAllCategories } from '@/services/categoryService';
 import { Product } from '@/app/models/Product';
-
+import { Category } from '@/app/models/Category';
 const MENU_OPTIONS = [
   
   { 
@@ -89,10 +89,10 @@ const GestionProductos = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('ACTIVO');
+  const [status, setStatus] = useState('active');
   const [categoryId, setCategoryId] = useState<number | null>(null);
 
-  const [categories, setCategories] = useState<{id:number,name:string}[]>([]);
+const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [message, setMessage] = useState('');
   const [activePath, setActivePath] = useState('/almacen/productos');
@@ -113,14 +113,23 @@ const [imageFile, setImageFile] = useState<File | null>(null);
     }
   };
 
-  const loadCategories = async () => {
-    try {
-      const data = await getAllCategories();
-      setCategories(data);
-    } catch (error: any) {
-      console.error('Error cargando categorías', error);
-    }
-  };
+ const loadCategories = async () => {
+  try {
+    const data = await getAllCategories();
+    // Validamos que 'id' exista antes de convertir a número
+    const formatted = data.map(c => ({
+      id_category: Number(c.id || c.id_category), 
+      name: c.name
+    }));
+    setCategories(formatted);
+  } catch (error: any) {
+    console.error('Error cargando categorías', error);
+  }
+};
+
+
+
+
   const uploadImage = async (): Promise<string | null> => {
   if (!imageFile) return null;
 
@@ -138,29 +147,46 @@ const [imageFile, setImageFile] = useState<File | null>(null);
 
 
  const handleCreateProduct = async () => {
-  if (!name || !price || !description || !categoryId || !imageFile) {
+  
+
+  if (!name || !price || !description || categoryId === null) {
     setMessage('ERROR: Complete todos los campos.');
+    
     return;
   }
 
-  try {
-    const imageUrl = await uploadImage();
-    if (!imageUrl) {
+  let imageUrl: string | undefined = undefined;
+
+  if (imageFile) {
+    try {
+      const uploadedUrl = await uploadImage();
+      
+      if (!uploadedUrl) {
+        setMessage('ERROR al subir imagen');
+        
+        return;
+      }
+      imageUrl = uploadedUrl;
+    } catch (error) {
       setMessage('ERROR al subir imagen');
+      
       return;
     }
+  }
 
-    const dto: Product = {
-      id_product: 0,
-      name,
-      price,
-      description,
-      status,
-      image_url: imageUrl, 
-      category: { id_category: categoryId, name: '' },
-    };
+  const dto: Product = {
+    id_product: 0,
+    name,
+    price,
+    description,
+    status,
+    image_url: imageUrl, // opcional
+    category: { id_category: categoryId, name: '' },
+  };
 
+  try {
     await createProduct(dto);
+    console.log('Producto creado exitosamente');
 
     setMessage('Producto creado correctamente!');
     setName('');
@@ -172,8 +198,11 @@ const [imageFile, setImageFile] = useState<File | null>(null);
     await loadProducts();
   } catch (error: any) {
     setMessage(error.message);
+    console.log('Error al crear producto en backend:', error);
   }
 };
+
+
 
 
   const handleLogout = () => router.push('/');
@@ -224,16 +253,22 @@ return (
   className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 text-sm"
 />
 
+<select
+  value={categoryId === null ? "" : categoryId} 
+  onChange={e => {
+    const val = e.target.value;
+    setCategoryId(val === "" ? null : Number(val));
+  }}
+  className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 focus:border-red-500 outline-none transition-all"
+>
+  <option value="">Seleccione una categoría</option>
+  {categories.map(c => (
+    <option key={c.id_category} value={c.id_category}>
+      {c.name}
+    </option>
+  ))}
+</select>
 
-        
-        {/* Combo box de categorías */}
-        <select value={categoryId||''} onChange={e=>setCategoryId(parseInt(e.target.value))}
-          className="w-full p-3 bg-gray-700 text-white rounded-lg border border-gray-600 text-sm">
-          <option value="">Seleccione una categoría</option>
-          {categories.map(c=>(
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
 
         <button onClick={handleCreateProduct} 
           className="w-full py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-all duration-300">
