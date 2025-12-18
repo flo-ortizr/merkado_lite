@@ -21,18 +21,22 @@ import { CartItem } from "./cart_item/cart_item.entity"
 import { PurchaseOrderItem } from "./purchase_order_item/purchase_order_item.entity"
 
 export const AppDataSource = new DataSource({
-    type: "mysql",
-host: process.env.MYSQL_HOST,
-port: Number(process.env.MYSQL_PORT),
-username: process.env.MYSQL_USER,
-password: process.env.MYSQL_PASSWORD,
-database: process.env.MYSQL_DATABASE,
+  type: "mysql",
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 
-    synchronize: true,
-    logging: true,
-    entities: [Role, User, Product, Category, Order, OrderDetail, Supplier, Inventory, InStoreSale, InStoreSaleDetail, 
-        PurchaseOrder, PurchaseOrderItem, Customer, AuditLog, Notification, Promotion, PriceHistory, Delivery, Cart, CartItem],
-    subscribers: [],
-    migrations: [],
-})
+  synchronize: true,
+  logging: true,
+
+  entities: [
+    Role, User, Product, Category, Order, OrderDetail,
+    Supplier, Inventory, InStoreSale, InStoreSaleDetail,
+    PurchaseOrder, PurchaseOrderItem, Customer, AuditLog,
+    Notification, Promotion, PriceHistory, Delivery,
+    Cart, CartItem
+  ],
+});
 export class AppModule {}

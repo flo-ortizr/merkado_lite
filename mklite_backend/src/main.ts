@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { AppDataSource } from './data-source';
 import * as express from 'express';
+
 
 async function bootstrap() {
   try {
@@ -22,7 +24,6 @@ async function bootstrap() {
   // Middleware para parsear JSON
   app.use(express.json());
 
-  // Puerto dinámico para Railway
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
 
