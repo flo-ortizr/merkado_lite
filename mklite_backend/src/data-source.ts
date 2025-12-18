@@ -22,11 +22,12 @@ import { PurchaseOrderItem } from "./purchase_order_item/purchase_order_item.ent
 
 export const AppDataSource = new DataSource({
     type: "mysql",
-    host: "localhost",
-    port: 3306,
-    username: "merkado_admin",
-    password: "1234",
-    database: "mklite",
+host: process.env.MYSQL_HOST,
+port: Number(process.env.MYSQL_PORT),
+username: process.env.MYSQL_USER,
+password: process.env.MYSQL_PASSWORD,
+database: process.env.MYSQL_DATABASE,
+
     synchronize: true,
     logging: true,
     entities: [Role, User, Product, Category, Order, OrderDetail, Supplier, Inventory, InStoreSale, InStoreSaleDetail, 
