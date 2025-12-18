@@ -69,7 +69,7 @@ export default function LoginPage() {
     <div className={styles.container}>
       <div className={styles.leftSide}>
         <div className={styles.formWrapper}>
-          <h1 className="text-4xl font-extrabold mb-8 text-center text-red-600 tracking-tight">
+          <h1 className="text-4xl font-extrabold mb-12 text-center text-red-600 tracking-tight">
             Login
           </h1>
 
@@ -107,7 +107,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="text-center mt-4">
+          <div className="text-center mt-8">
             <a
               href="/Register"
               className="text-red-600 font-medium hover:text-red-800 transition"

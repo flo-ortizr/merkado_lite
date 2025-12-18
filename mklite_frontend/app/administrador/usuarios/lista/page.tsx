@@ -81,39 +81,55 @@ const UserRoleManagement = () => {
     return (
         <div style={{ display: 'flex', position: 'relative' }}>
             
-            {/* Menú lateral */}
-            <nav style={{
-                width: '220px',
-                backgroundColor: '#1F2937',
-                minHeight: '100vh',
-                padding: '20px',
-                color: '#fff',
+{/* Menú lateral */}
+<nav style={{
+    width: '220px',
+    backgroundColor: '#111827', // fondo oscuro elegante
+    minHeight: '100vh',
+    padding: '25px 15px',
+    color: '#F9FAFB',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    boxShadow: '2px 0 8px rgba(0,0,0,0.2)'
+}}>
+    <h2 style={{
+        fontSize: '20px',
+        fontWeight: '700',
+        marginBottom: '25px',
+        letterSpacing: '1px',
+        borderBottom: '1px solid #374151',
+        paddingBottom: '10px'
+    }}>Menú</h2>
+
+    {MENU_OPTIONS.map(option => (
+        <button
+            key={option.path}
+            onClick={() => goTo(option.path)}
+            style={{
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-            }}>
-                <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Menú</h2>
-                {MENU_OPTIONS.map(option => (
-                    <button 
-                        key={option.path}
-                        onClick={() => goTo(option.path)}
-                        style={{
-                            padding: '10px 15px',
-                            backgroundColor: activePath === option.path ? '#4B5563' : '#374151',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            color: '#fff',
-                            textAlign: 'left',
-                            transition: 'background-color 0.2s',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4B5563')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = activePath === option.path ? '#4B5563' : '#374151')}
-                    >
-                        {option.label}
-                    </button>
-                ))}
-            </nav>
+                alignItems: 'center',
+                gap: '10px',
+                padding: '12px 15px',
+                backgroundColor: activePath === option.path ? '#2563EB' : '#1F2937',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                color: '#F9FAFB',
+                fontWeight: '500',
+                textAlign: 'left',
+                transition: 'all 0.3s',
+                boxShadow: activePath === option.path ? '0 4px 6px rgba(0,0,0,0.2)' : 'none'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#374151'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = activePath === option.path ? '#2563EB' : '#1F2937'}
+        >
+           
+            {option.label}
+        </button>
+    ))}
+</nav>
+
 
             {/* Contenedor principal */}
             <div className={styles.container} style={{ flex: 1, position: 'relative', padding: '20px' }}>

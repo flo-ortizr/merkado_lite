@@ -14,7 +14,7 @@ export default function ReposicionStockPage() {
   const [mostrarModal, setMostrarModal] = useState<boolean>(false);
   const [mensaje, setMensaje] = useState<string>('');
   const [cargando, setCargando] = useState<boolean>(true);
-
+ const [activePath, setActivePath] = useState('/almacen/productos');
   // Cargar alertas al montar el componente
   useEffect(() => {
     cargarAlertas();
@@ -107,12 +107,97 @@ export default function ReposicionStockPage() {
     }
   };
 
+  const MENU_OPTIONS = [
+  
+  { 
+    label: 'Alertas', 
+    path: '/almacen/alertas', 
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    ) 
+  },
+  { 
+    label: 'Inventario', 
+    path: '/almacen/inventario', 
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10m-4-6h8m-4 0v-4"></path>
+      </svg>
+    ) 
+  },
+  { 
+    label: 'Reposición Stock', 
+    path: '/almacen/reposicion-stock', 
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 0020 8h-2.22l-.123-.382a8.04 8.04 0 00-15.658 0L4.22 8H20v2m-6-10v5m-6-5v5m-4 2l4 4m6-4l-4 4"></path>
+      </svg>
+    ) 
+  },
+  { 
+    label: 'Vencidos', 
+    path: '/almacen/vencidos', 
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+      </svg>
+    ) 
+  },
+  { 
+    label: 'Órdenes de Compra', 
+    path: '/almacen/ordenes-compra', 
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+      </svg>
+    ) 
+  },
+];
+
+const SidebarMenu = ({ menuOptions, activePath }) => {
   return (
-    <div className="min-h-screen bg-rose-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        
+    <nav className="flex flex-col space-y-2">
+      {menuOptions.map((item) => (
+        <a
+          key={item.path}
+          href={item.path}
+          className={`
+            flex items-center px-4 py-3 rounded-lg
+            text-sm font-medium transition-colors duration-200
+            ${
+              item.path === activePath || item.isActive
+                ? 'bg-gray-700 text-gray-100'
+                : 'text-gray-300 hover:bg-gray-600 hover:text-gray-100'
+            }
+          `}
+        >
+          <span className="mr-3">{item.icon}</span>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  );
+};
+
+ return (
+  <div className="min-h-screen bg-rose-50 p-6">
+    <div className="max-w-6xl mx-auto flex gap-6">
+      
+      {/* Menu lateral */}
+      <div className="w-60 p-4 bg-gray-900 rounded-lg shadow-inner flex flex-col flex-shrink-0">
+        <h2 className="text-lg font-semibold mb-5 text-gray-300 border-b border-gray-700 pb-3">
+          Menú
+        </h2>
+        <SidebarMenu menuOptions={MENU_OPTIONS} activePath={activePath} />
+      </div>
+
+      {/* Contenido principal */}
+      <div className="flex-1 flex flex-col gap-8">
+
         {/* Header */}
-        <div className="mb-8">
+        <div>
           <h1 className="text-3xl font-bold text-gray-900">Sistema de Reposición de Stock</h1>
           <p className="text-gray-600 mt-2">Monitoreo y gestión de inventario</p>
         </div>
@@ -285,5 +370,7 @@ export default function ReposicionStockPage() {
 
       </div>
     </div>
-  );
+  </div>
+);
+
 }
